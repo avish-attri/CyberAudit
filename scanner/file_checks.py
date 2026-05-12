@@ -1,5 +1,7 @@
 import os
-from scanner.utils import run_command
+import subprocess
+
+from scanner.utils import build_result, run_command
 
 
 def check_passwd_permissions():
@@ -95,3 +97,37 @@ def check_world_writable_files():
         "details": f"Found {len(files)} writable files",
         "recommendation": "Restrict write permissions",
     }
+
+
+def check_suid_binaries():
+    try:
+        result = subprocess.run(
+            "find / -perm -4000 -type f 2>/dev/null | head -50",
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        binaries = result.stdout.splitlines()
+        count = len(binaries)
+        status = "pass"
+        if count > 40:
+            status = "warn"
+
+        return build_result(
+            "FILE-SUID-BINARIES",
+            "SUID Binary Check",
+            status,
+            {
+                "count": count,
+                "sample": binaries[:10],
+            },
+        )
+    except Exception as e:
+        return build_result(
+            "FILE-SUID-BINARIES",
+            "SUID Binary Check",
+            "unknown",
+            {
+                "error": str(e),
+            },
+        )

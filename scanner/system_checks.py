@@ -1,4 +1,7 @@
-from scanner.utils import run_command
+import shutil
+import subprocess
+
+from scanner.utils import build_result, run_command
 
 
 def check_kernel_version():
@@ -55,3 +58,60 @@ def check_pending_updates():
         "details": f"{updates} packages can be upgraded",
         "recommendation": "Install latest security updates",
     }
+
+
+def check_disk_usage():
+    total, used, free = shutil.disk_usage("/")
+    used_percent = round((used / total) * 100, 2)
+    status = "pass"
+    if used_percent >= 90:
+        status = "fail"
+    elif used_percent >= 75:
+        status = "warn"
+
+    return build_result(
+        "SYSTEM-DISK-USAGE",
+        "Root Disk Usage",
+        status,
+        {
+            "used_percent": used_percent,
+            "free_gb": round(free / (1024**3), 2),
+        },
+    )
+
+
+def check_security_updates():
+    try:
+        result = subprocess.run(
+            ["apt", "list", "--upgradable"],
+            capture_output=True,
+            text=True,
+        )
+
+        output = result.stdout.lower()
+        security_updates = []
+        for line in output.splitlines():
+            if "security" in line:
+                security_updates.append(line)
+
+        status = "pass"
+        if len(security_updates) > 0:
+            status = "warn"
+
+        return build_result(
+            "SYSTEM-SECURITY-UPDATES",
+            "Security Updates",
+            status,
+            {
+                "security_updates_count": len(security_updates),
+            },
+        )
+    except Exception as e:
+        return build_result(
+            "SYSTEM-SECURITY-UPDATES",
+            "Security Updates",
+            "unknown",
+            {
+                "error": str(e),
+            },
+        )

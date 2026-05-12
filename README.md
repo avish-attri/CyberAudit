@@ -16,5 +16,5 @@ python test_runner.py
 
 ## API Endpoints
 
-- GET /health
-- GET /scan
+- POST /api/scan
+- GET /api/results

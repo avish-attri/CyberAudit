@@ -1,17 +1,5 @@
 const { useEffect, useMemo, useState } = React;
 
-const THEME_KEY = "secAuditTheme";
-
-function getInitialTheme() {
-    const savedTheme = localStorage.getItem(THEME_KEY);
-    if (savedTheme === "dark" || savedTheme === "light") {
-        return savedTheme;
-    }
-    const prefersDark = window.matchMedia &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches;
-    return prefersDark ? "dark" : "light";
-}
-
 function countStatuses(results) {
     const counts = { PASS: 0, WARNING: 0, FAIL: 0, ERROR: 0 };
     for (const item of results) {
@@ -26,16 +14,14 @@ function countStatuses(results) {
 }
 
 function DashboardApp() {
-    const [theme, setTheme] = useState(getInitialTheme);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const [report, setReport] = useState(null);
     const [lastScan, setLastScan] = useState("Not yet run");
 
     useEffect(() => {
-        document.documentElement.setAttribute("data-theme", theme);
-        localStorage.setItem(THEME_KEY, theme);
-    }, [theme]);
+        document.documentElement.setAttribute("data-theme", "dark");
+    }, []);
 
     const results = report?.results ?? [];
     const statusCounts = useMemo(() => countStatuses(results), [results]);
@@ -67,8 +53,6 @@ function DashboardApp() {
         }
     }
 
-    const themeBtnLabel = theme === "dark" ? "Light mode" : "Dark mode";
-
     return (
         <div className="container">
                 <header className="topbar">
@@ -79,14 +63,6 @@ function DashboardApp() {
                         </p>
                     </div>
                     <div className="topbar-actions">
-                        <button
-                            className="secondary-btn"
-                            type="button"
-                            aria-label="Toggle dark mode"
-                            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                        >
-                            {themeBtnLabel}
-                        </button>
                         <button type="button" onClick={runScan} disabled={isLoading}>
                             {isLoading ? "Scanning..." : "Run Scan"}
                         </button>

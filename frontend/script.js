@@ -1,26 +1,10 @@
 const scanBtn = document.getElementById("scanBtn");
-<<<<<<< HEAD
-const themeToggleBtn = document.getElementById("themeToggleBtn");
 const output = document.getElementById("output");
 const lastScanValue = document.getElementById("lastScanValue");
 const totalChecksValue = document.getElementById("totalChecksValue");
 
-const THEME_KEY = "secAuditTheme";
-
-function applyTheme(theme) {
-    document.documentElement.setAttribute("data-theme", theme);
-    themeToggleBtn.textContent = theme === "dark" ? "Light mode" : "Dark mode";
-}
-
-function initTheme() {
-    const savedTheme = localStorage.getItem(THEME_KEY);
-    if (savedTheme === "dark" || savedTheme === "light") {
-        applyTheme(savedTheme);
-        return;
-    }
-    const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-    applyTheme(prefersDark ? "dark" : "light");
-}
+// Set dark mode
+document.documentElement.setAttribute("data-theme", "dark");
 
 function escapeHtml(value) {
     return String(value)
@@ -93,13 +77,6 @@ function renderReport(report) {
     `;
 }
 
-themeToggleBtn.addEventListener("click", () => {
-    const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
-    const nextTheme = currentTheme === "dark" ? "light" : "dark";
-    localStorage.setItem(THEME_KEY, nextTheme);
-    applyTheme(nextTheme);
-});
-
 scanBtn.addEventListener("click", async () => {
     output.innerHTML = '<p class="loading">Running scan...</p>';
     try {
@@ -115,19 +92,3 @@ scanBtn.addEventListener("click", async () => {
         output.innerHTML = `<p class="error">Error: ${escapeHtml(error.message)}</p>`;
     }
 });
-
-initTheme();
-=======
-const output = document.getElementById("output");
-
-scanBtn.addEventListener("click", async () => {
-    output.textContent = "Running scan...";
-    try {
-        const response = await fetch("http://127.0.0.1:5000/scan");
-        const data = await response.json();
-        output.textContent = JSON.stringify(data, null, 4);
-    } catch (error) {
-        output.textContent = "Error: " + error.message;
-    }
-});
->>>>>>> 73af21f54f9b402aae73349e99c9a52ea3c40b0b

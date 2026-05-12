@@ -1,17 +1,4 @@
-<<<<<<< HEAD
 :root {
-    --bg: #eef2ff;
-    --panel: #ffffff;
-    --panel-soft: #f8fafc;
-    --text: #111827;
-    --text-soft: #475569;
-    --border: #e2e8f0;
-    --accent: #2563eb;
-    --accent-strong: #1d4ed8;
-    --shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
-}
-
-[data-theme="dark"] {
     --bg: #0b1220;
     --panel: #111827;
     --panel-soft: #172033;
@@ -29,15 +16,11 @@
 
 body {
     font-family: Inter, Arial, sans-serif;
-    background: radial-gradient(circle at top left, #dbeafe 0%, var(--bg) 35%);
+    background: radial-gradient(circle at top left, #1e293b 0%, var(--bg) 35%);
     margin: 0;
     padding: 28px 18px;
     color: var(--text);
     min-height: 100vh;
-}
-
-[data-theme="dark"] body {
-    background: radial-gradient(circle at top left, #1e293b 0%, var(--bg) 35%);
 }
 
 .container {
@@ -184,6 +167,8 @@ button:hover {
 .bar-fill {
     height: 100%;
     border-radius: 999px;
+    width: 0;
+    transition: width 0.3s ease;
 }
 
 .bar-fill.pass {
@@ -199,7 +184,7 @@ button:hover {
 }
 
 .bar-fill.error {
-    background: #9333ea;
+    background: #6b7280;
 }
 
 .score-row {
@@ -258,8 +243,8 @@ button:hover {
 
 .status-item.error,
 .status-error {
-    background: #a855f724;
-    color: #9333ea;
+    background: #4b555024;
+    color: #6b7280;
 }
 
 .checks-section {
@@ -338,37 +323,5 @@ button:hover {
     .status-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-=======
-body {
-    font-family: Arial, sans-serif;
-    background: #f4f4f4;
-    margin: 0;
-    padding: 20px;
 }
-
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-}
-
-button {
-    padding: 10px 16px;
-    border: none;
-    background: #2563eb;
-    color: white;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-pre {
-    margin-top: 16px;
-    background: #111827;
-    color: #d1fae5;
-    padding: 12px;
-    border-radius: 6px;
-    overflow: auto;
->>>>>>> 73af21f54f9b402aae73349e99c9a52ea3c40b0b
 }
