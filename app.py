@@ -24,6 +24,7 @@ def serve_scan():
 
 
 @app.route("/scan-result", methods=["GET"])
+@app.route("/scan-results", methods=["GET"])
 def serve_scan_result():
     return send_from_directory(FRONTEND_DIR, "index.html")
 

@@ -19,8 +19,22 @@ function DashboardApp() {
     const [report, setReport] = useState(null);
     const [lastScan, setLastScan] = useState("Not yet run");
 
+    const getRouteFromPath = () => {
+        const path = window.location.pathname.replace(/\/+$/, "");
+        return path === "/scan-result" || path === "/scan-results" ? "result" : "scan";
+    };
+
+    const [route, setRoute] = useState(getRouteFromPath);
+
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", "dark");
+
+        const onPopState = () => {
+            setRoute(getRouteFromPath());
+        };
+
+        window.addEventListener("popstate", onPopState);
+        return () => window.removeEventListener("popstate", onPopState);
     }, []);
 
     const results = report?.results ?? [];
@@ -32,6 +46,19 @@ function DashboardApp() {
         { key: "ERROR", label: "ERROR", count: statusCounts.ERROR, className: "error" }
     ]), [statusCounts]);
     const totalChecks = results.length;
+    const sortedResults = useMemo(() => {
+        const order = { FAIL: 1, ERROR: 2, WARNING: 3, PASS: 4 };
+        return [...results].sort((a, b) => {
+            const aStatus = (a.status || "ERROR").toUpperCase();
+            const bStatus = (b.status || "ERROR").toUpperCase();
+            return (order[aStatus] || 99) - (order[bStatus] || 99);
+        });
+    }, [results]);
+
+    const navigate = (path) => {
+        window.history.pushState({}, "", path);
+        setRoute(getRouteFromPath());
+    };
 
     async function runScan() {
         setError("");
@@ -46,6 +73,7 @@ function DashboardApp() {
             const data = await response.json();
             setReport(data);
             setLastScan(new Date().toLocaleString());
+            navigate("/scan-results");
         } catch (err) {
             setError(err?.message || "Failed to run scan");
         } finally {
@@ -64,7 +92,7 @@ function DashboardApp() {
                     </div>
                     <div className="topbar-actions">
                         <button type="button" onClick={runScan} disabled={isLoading}>
-                            {isLoading ? "Scanning..." : "Run Scan"}
+                            {isLoading ? "Scanning..." : route === "result" ? "Rescan" : "Run Scan"}
                         </button>
                     </div>
                 </header>
@@ -131,7 +159,7 @@ function DashboardApp() {
                             </section>
 
                             <section className="checks-section">
-                                {results.map((item, index) => {
+                                {sortedResults.map((item, index) => {
                                     const status = (item.status || "ERROR").toLowerCase();
                                     return (
                                         <article className="check-card" key={`${item.name}-${index}`}>
