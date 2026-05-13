@@ -40,32 +40,50 @@ def check_open_ports():
 
 def check_firewall_status():
     """
-    Check if UFW firewall is active.
+    Check whether a supported firewall is active.
     """
-    result = run_command("ufw status")
-    if not result["success"]:
+    ufw_result = run_command("ufw status verbose")
+    if ufw_result["success"]:
+        output = ufw_result["output"].lower()
+        if "status: active" in output or "active" in output:
+            return {
+                "name": "Firewall Status",
+                "status": "PASS",
+                "risk": "Low",
+                "details": "UFW firewall is active",
+                "recommendation": "No action needed",
+            }
         return {
             "name": "Firewall Status",
-            "status": "WARNING",
-            "risk": "Medium",
-            "details": "Unable to determine firewall status",
-            "recommendation": "Install or configure UFW",
+            "status": "FAIL",
+            "risk": "High",
+            "details": "UFW firewall is inactive",
+            "recommendation": "Enable UFW firewall",
         }
 
-    output = result["output"]
-    if "Status: active" in output:
+    firewalld_result = run_command("firewall-cmd --state")
+    if firewalld_result["success"]:
+        output = firewalld_result["output"].strip().lower()
+        if output == "running":
+            return {
+                "name": "Firewall Status",
+                "status": "PASS",
+                "risk": "Low",
+                "details": "firewalld is running",
+                "recommendation": "No action needed",
+            }
         return {
             "name": "Firewall Status",
-            "status": "PASS",
-            "risk": "Low",
-            "details": "Firewall is active",
-            "recommendation": "No action needed",
+            "status": "FAIL",
+            "risk": "High",
+            "details": "firewalld is not running",
+            "recommendation": "Start and enable firewalld",
         }
 
     return {
         "name": "Firewall Status",
-        "status": "FAIL",
-        "risk": "High",
-        "details": "Firewall is inactive",
-        "recommendation": "Enable UFW firewall",
+        "status": "WARNING",
+        "risk": "Medium",
+        "details": "Unable to determine firewall status",
+        "recommendation": "Install or configure UFW or firewalld",
     }

@@ -13,7 +13,8 @@ def run_command(command):
             text=True,
         )
         return {
-            "success": True,
+            "success": result.returncode == 0,
+            "returncode": result.returncode,
             "output": result.stdout.strip(),
             "error": result.stderr.strip(),
         }
