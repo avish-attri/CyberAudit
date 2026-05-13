@@ -26,6 +26,7 @@ function DashboardApp() {
 
     const [route, setRoute] = useState(getRouteFromPath);
     const [activeTab, setActiveTab] = useState("high");
+    const [sudoPassword, setSudoPassword] = useState("");
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", "dark");
@@ -124,7 +125,11 @@ function DashboardApp() {
         setIsLoading(true);
         try {
             const response = await fetch("http://127.0.0.1:5000/api/scan", {
-                method: "POST"
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ sudo_password: sudoPassword }),
             });
             if (!response.ok) {
                 throw new Error(`Request failed with status ${response.status}`);
@@ -165,6 +170,16 @@ function DashboardApp() {
                     </div>
                     <div className="meta-item">
                         <span>Host IP:</span> <strong>{report?.host_ip || "-"}</strong>
+                    </div>
+                    <div className="meta-item">
+                        <label htmlFor="sudo-password">Sudo Password</label>
+                        <input
+                            id="sudo-password"
+                            type="password"
+                            value={sudoPassword}
+                            onChange={(event) => setSudoPassword(event.target.value)}
+                            placeholder="Optional sudo password"
+                        />
                     </div>
                     <div className="meta-item">
                         <span>Scan Time:</span> <strong>{formatDuration(report?.duration_seconds)}</strong>

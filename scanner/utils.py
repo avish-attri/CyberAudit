@@ -1,16 +1,21 @@
 import subprocess
 
 
-def run_command(command):
+def run_command(command, sudo_password=None):
     """
     Runs a shell command safely and returns output.
+    If sudo_password is provided, the command will be run with sudo.
     """
+    if sudo_password is not None and not command.strip().startswith("sudo "):
+        command = f"sudo -S {command}"
+
     try:
         result = subprocess.run(
             command,
             shell=True,
             capture_output=True,
             text=True,
+            input=(sudo_password + "\n") if sudo_password is not None else None,
         )
         return {
             "success": result.returncode == 0,

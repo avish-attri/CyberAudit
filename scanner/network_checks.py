@@ -38,11 +38,11 @@ def check_open_ports():
     }
 
 
-def check_firewall_status():
+def check_firewall_status(sudo_password=None):
     """
     Check whether a supported firewall is active.
     """
-    ufw_result = run_command("ufw status verbose")
+    ufw_result = run_command("ufw status", sudo_password=None)
     if ufw_result["success"]:
         output = ufw_result["output"].lower()
         if "status: active" in output or "active" in output:
@@ -61,7 +61,27 @@ def check_firewall_status():
             "recommendation": "Enable UFW firewall",
         }
 
-    firewalld_result = run_command("firewall-cmd --state")
+    if sudo_password:
+        ufw_result = run_command("ufw status", sudo_password=sudo_password)
+        if ufw_result["success"]:
+            output = ufw_result["output"].lower()
+            if "status: active" in output or "active" in output:
+                return {
+                    "name": "Firewall Status",
+                    "status": "PASS",
+                    "risk": "Low",
+                    "details": "UFW firewall is active",
+                    "recommendation": "No action needed",
+                }
+            return {
+                "name": "Firewall Status",
+                "status": "FAIL",
+                "risk": "High",
+                "details": "UFW firewall is inactive",
+                "recommendation": "Enable UFW firewall",
+            }
+
+    firewalld_result = run_command("firewall-cmd --state", sudo_password=None)
     if firewalld_result["success"]:
         output = firewalld_result["output"].strip().lower()
         if output == "running":
@@ -79,6 +99,26 @@ def check_firewall_status():
             "details": "firewalld is not running",
             "recommendation": "Start and enable firewalld",
         }
+
+    if sudo_password:
+        firewalld_result = run_command("firewall-cmd --state", sudo_password=sudo_password)
+        if firewalld_result["success"]:
+            output = firewalld_result["output"].strip().lower()
+            if output == "running":
+                return {
+                    "name": "Firewall Status",
+                    "status": "PASS",
+                    "risk": "Low",
+                    "details": "firewalld is running",
+                    "recommendation": "No action needed",
+                }
+            return {
+                "name": "Firewall Status",
+                "status": "FAIL",
+                "risk": "High",
+                "details": "firewalld is not running",
+                "recommendation": "Start and enable firewalld",
+            }
 
     return {
         "name": "Firewall Status",
