@@ -201,13 +201,18 @@ button:hover {
 }
 
 .bar-fill {
-        display: block;
-        height: 100%;
-        border-radius: 999px;
-        width: 0;
-        min-width: 3px;
-        transition: width 0.3s ease;
-    }
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    width: 0;
+    min-width: 3px;
+    padding: 0;
+    transition: width 0.3s ease;
+}
+
+.bar-fill.error {
+    padding: 0;
+}
 .bar-fill.pass {
     background: #16a34a;
 }
