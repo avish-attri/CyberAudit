@@ -125,5 +125,5 @@ def check_firewall_status(sudo_password=None):
         "status": "WARNING",
         "risk": "Medium",
         "details": "Unable to determine firewall status",
-        "recommendation": "Install or configure UFW or firewalld",
+        "recommendation": "Give sudo permission or Install or configure UFW or firewalld",
     }
