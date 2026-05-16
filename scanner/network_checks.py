@@ -1,4 +1,4 @@
-from scanner.utils import run_command
+from scanner.utils import is_permission_error, run_command
 
 
 def check_open_ports():
@@ -38,11 +38,11 @@ def check_open_ports():
     }
 
 
-def check_firewall_status(sudo_password=None):
+def check_firewall_status():
     """
     Check whether a supported firewall is active.
     """
-    ufw_result = run_command("ufw status", sudo_password=None)
+    ufw_result = run_command("ufw status")
     if ufw_result["success"]:
         output = ufw_result["output"].lower()
         if "status: active" in output or "active" in output:
@@ -61,27 +61,16 @@ def check_firewall_status(sudo_password=None):
             "recommendation": "Enable UFW firewall",
         }
 
-    if sudo_password:
-        ufw_result = run_command("ufw status", sudo_password=sudo_password)
-        if ufw_result["success"]:
-            output = ufw_result["output"].lower()
-            if "status: active" in output or "active" in output:
-                return {
-                    "name": "Firewall Status",
-                    "status": "PASS",
-                    "risk": "Low",
-                    "details": "UFW firewall is active",
-                    "recommendation": "No action needed",
-                }
-            return {
-                "name": "Firewall Status",
-                "status": "FAIL",
-                "risk": "High",
-                "details": "UFW firewall is inactive",
-                "recommendation": "Enable UFW firewall",
-            }
+    if is_permission_error(ufw_result["error"]):
+        return {
+            "name": "Firewall Status",
+            "status": "PERMISSION REQUIRED",
+            "risk": "Medium",
+            "details": "Unable to check UFW status because root/sudo permissions are required.",
+            "recommendation": "Run the scanner with sufficient privileges to query firewall status.",
+        }
 
-    firewalld_result = run_command("firewall-cmd --state", sudo_password=None)
+    firewalld_result = run_command("firewall-cmd --state")
     if firewalld_result["success"]:
         output = firewalld_result["output"].strip().lower()
         if output == "running":
@@ -100,30 +89,20 @@ def check_firewall_status(sudo_password=None):
             "recommendation": "Start and enable firewalld",
         }
 
-    if sudo_password:
-        firewalld_result = run_command("firewall-cmd --state", sudo_password=sudo_password)
-        if firewalld_result["success"]:
-            output = firewalld_result["output"].strip().lower()
-            if output == "running":
-                return {
-                    "name": "Firewall Status",
-                    "status": "PASS",
-                    "risk": "Low",
-                    "details": "firewalld is running",
-                    "recommendation": "No action needed",
-                }
-            return {
-                "name": "Firewall Status",
-                "status": "FAIL",
-                "risk": "High",
-                "details": "firewalld is not running",
-                "recommendation": "Start and enable firewalld",
-            }
+    if is_permission_error(firewalld_result["error"]):
+        return {
+            "name": "Firewall Status",
+            "status": "PERMISSION REQUIRED",
+            "risk": "Medium",
+            "details": "Unable to check firewalld status because root/sudo permissions are required.",
+            "recommendation": "Run the scanner with sufficient privileges to query firewall status.",
+        }
 
+    details = ufw_result["error"] or firewalld_result["error"] or "Unable to determine firewall status"
     return {
         "name": "Firewall Status",
         "status": "WARNING",
         "risk": "Medium",
-        "details": "Unable to determine firewall status",
-        "recommendation": "Give sudo permission or Install or configure UFW or firewalld",
+        "details": f"Unable to determine firewall status: {details}",
+        "recommendation": "Install or configure UFW or firewalld",
     }

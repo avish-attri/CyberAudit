@@ -43,13 +43,13 @@ def get_local_ip():
         return "127.0.0.1"
 
 
-def run_all_checks(sudo_password=None):
+def run_all_checks():
     results = []
     results.append(check_uid_zero_users())
     results.append(check_ssh_root_login())
     results.append(check_ssh_password_auth())
     results.append(check_open_ports())
-    results.append(check_firewall_status(sudo_password=sudo_password))
+    results.append(check_firewall_status())
     results.append(check_passwd_permissions())
     results.append(check_shadow_permissions())
     results.append(check_world_writable_files())
@@ -68,9 +68,9 @@ def run_all_checks(sudo_password=None):
     return results
 
 
-def build_scan_report(sudo_password=None):
+def build_scan_report():
     start_time = time.perf_counter()
-    results = run_all_checks(sudo_password=sudo_password)
+    results = run_all_checks()
     duration_seconds = time.perf_counter() - start_time
     score = calculate_score(results)
     return {

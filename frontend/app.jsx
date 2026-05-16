@@ -1,14 +1,16 @@
 const { useEffect, useMemo, useState } = React;
 
 function countStatuses(results) {
-    const counts = { PASS: 0, WARNING: 0, FAIL: 0, ERROR: 0 };
+    const counts = {
+        PASS: 0,
+        WARNING: 0,
+        FAIL: 0,
+        ERROR: 0,
+        "PERMISSION REQUIRED": 0,
+    };
     for (const item of results) {
-        const status = item?.status;
-        if (counts[status] !== undefined) {
-            counts[status] += 1;
-        } else {
-            counts.ERROR += 1;
-        }
+        const status = item?.status || "ERROR";
+        counts[status] = (counts[status] || 0) + 1;
     }
     return counts;
 }
@@ -26,7 +28,6 @@ function DashboardApp() {
 
     const [route, setRoute] = useState(getRouteFromPath);
     const [activeTab, setActiveTab] = useState("high");
-    const [sudoPassword, setSudoPassword] = useState("");
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", "dark");
@@ -45,6 +46,7 @@ function DashboardApp() {
         { key: "PASS", label: "PASS", count: statusCounts.PASS, className: "pass" },
         { key: "WARNING", label: "WARNING", count: statusCounts.WARNING, className: "warning" },
         { key: "FAIL", label: "FAIL", count: statusCounts.FAIL, className: "fail" },
+        { key: "PERMISSION REQUIRED", label: "PERMISSION REQUIRED", count: statusCounts["PERMISSION REQUIRED"], className: "permission" },
         { key: "ERROR", label: "UNAVAILABLE", count: statusCounts.ERROR, className: "error" }
     ]), [statusCounts]);
     const totalChecks = results.length;
@@ -52,7 +54,8 @@ function DashboardApp() {
         PASS: "🛡️",
         FAIL: "⚠️",
         WARNING: "🚨",
-        ERROR: "❌"
+        ERROR: "❌",
+        "PERMISSION REQUIRED": "🔒",
     };
 
     const formatDuration = (seconds) => {
@@ -79,7 +82,7 @@ function DashboardApp() {
     };
 
     const sortedResults = useMemo(() => {
-        const order = { FAIL: 1, WARNING: 2, ERROR: 3, PASS: 4 };
+        const order = { FAIL: 1, WARNING: 2, "PERMISSION REQUIRED": 3, ERROR: 4, PASS: 5 };
         return [...results].sort((a, b) => {
             const aStatus = (a.status || "ERROR").toUpperCase();
             const bStatus = (b.status || "ERROR").toUpperCase();
@@ -126,10 +129,6 @@ function DashboardApp() {
         try {
             const response = await fetch("http://127.0.0.1:5000/api/scan", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ sudo_password: sudoPassword }),
             });
             if (!response.ok) {
                 throw new Error(`Request failed with status ${response.status}`);
@@ -172,16 +171,6 @@ function DashboardApp() {
                         <span>Host IP:</span> <strong>{report?.host_ip || "-"}</strong>
                     </div>
                     <div className="meta-item">
-                        <label htmlFor="sudo-password">Sudo Password</label>
-                        <input
-                            id="sudo-password"
-                            type="password"
-                            value={sudoPassword}
-                            onChange={(event) => setSudoPassword(event.target.value)}
-                            placeholder="Optional sudo password"
-                        />
-                    </div>
-                    <div className="meta-item">
                         <span>Scan Time:</span> <strong>{formatDuration(report?.duration_seconds)}</strong>
                     </div>
                 </section>
@@ -211,6 +200,7 @@ function DashboardApp() {
                                     <div className="status-item pass">PASS: {statusCounts.PASS}</div>
                                     <div className="status-item warning">WARNING: {statusCounts.WARNING}</div>
                                     <div className="status-item fail">FAIL: {statusCounts.FAIL}</div>
+                                    <div className="status-item permission">PERMISSION REQUIRED: {statusCounts["PERMISSION REQUIRED"]}</div>
                                     <div className="status-item error">UNAVAILABLE: {statusCounts.ERROR}</div>
                                 </div>
                             </section>
@@ -259,13 +249,14 @@ function DashboardApp() {
 
                             <section className="checks-section">
                                 {activeTabResults.map((item, index) => {
-                                    const status = (item.status || "ERROR").toLowerCase();
+                                    const statusValue = (item.status || "ERROR").toUpperCase();
+                                    const statusClass = statusValue.replace(/\s+/g, "-").toLowerCase();
                                     return (
                                         <article className="check-card" key={`${item.name}-${index}`}>
                                             <div className="card-header">
                                                 <h3>{item.name || "Unnamed Check"}</h3>
-                                                <span className={`status-badge status-${status}`}>
-                                                    {statusIconMap[(item.status || "ERROR").toUpperCase()] || "❔"}
+                                                <span className={`status-badge status-${statusClass}`}>
+                                                    {statusIconMap[statusValue] || "❔"}
                                                     {" "}{getStatusLabel(item)}
                                                 </span>
                                             </div>

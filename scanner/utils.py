@@ -1,45 +1,22 @@
 import subprocess
 
 
-def run_command(command, sudo_password=None):
+def run_command(command):
     """
     Runs a shell command safely and returns output.
-    If sudo_password is provided, the command will be run with sudo.
     """
-    if sudo_password is not None and not command.strip().startswith("sudo "):
-        command = f"sudo -S {command}"
-
     try:
         result = subprocess.run(
             command,
             shell=True,
             capture_output=True,
             text=True,
-            input=(sudo_password + "\n") if sudo_password is not None else None,
         )
-        stdout = result.stdout.strip()
-        stderr = result.stderr.strip()
-
-        if result.returncode != 0 and sudo_password is not None:
-            low_err = stderr.lower()
-            if (
-                "sorry, try again" in low_err
-                or "authentication failure" in low_err
-                or "a password is required" in low_err
-                or ("sudo:" in low_err and "password" in low_err)
-            ):
-                return {
-                    "success": False,
-                    "returncode": result.returncode,
-                    "output": "",
-                    "error": "Incorrect sudo password or sudo authentication failed",
-                }
-
         return {
             "success": result.returncode == 0,
             "returncode": result.returncode,
-            "output": stdout,
-            "error": stderr,
+            "output": result.stdout.strip(),
+            "error": result.stderr.strip(),
         }
     except Exception as e:
         return {
@@ -47,6 +24,26 @@ def run_command(command, sudo_password=None):
             "output": "",
             "error": str(e),
         }
+
+
+def is_permission_error(message):
+    if not message:
+        return False
+
+    text = message.lower()
+    return any(
+        phrase in text
+        for phrase in [
+            "permission denied",
+            "access denied",
+            "operation not permitted",
+            "requires root",
+            "must be root",
+            "root privileges are required",
+            "you may need to run this command as root",
+            "not authorized",
+        ]
+    )
 
 
 def build_result(check_id, name, status, data):

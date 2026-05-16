@@ -287,18 +287,10 @@ button:disabled {
     background: #dc2626;
 }
 
-.bar-fill.error {
-    background: #6b7280;
-}
+    .bar-fill.permission {
+        background: #8b5cf6;
+    }
 
-.score-row {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 12px;
-}
-
-.score-label {
     color: var(--text-soft);
     font-weight: 600;
 }
@@ -311,9 +303,7 @@ button:disabled {
 
 .status-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px;
-}
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 
 .status-item {
     border-radius: 9px;
@@ -345,7 +335,13 @@ button:disabled {
     color: #dc2626;
 }
 
-.status-item.error,
+.status-item.permission,
+    .status-permission {
+        background: #ede9fe;
+        color: #7c3aed;
+    }
+
+    .status-item.error,
 .status-error {
     background: #4b555024;
     color: #6b7280;
