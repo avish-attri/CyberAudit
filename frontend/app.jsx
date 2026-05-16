@@ -1,16 +1,14 @@
 const { useEffect, useMemo, useState } = React;
 
 function countStatuses(results) {
-    const counts = {
-        PASS: 0,
-        WARNING: 0,
-        FAIL: 0,
-        ERROR: 0,
-        "PERMISSION REQUIRED": 0,
-    };
+    const counts = { PASS: 0, WARNING: 0, FAIL: 0, ERROR: 0 };
     for (const item of results) {
-        const status = item?.status || "ERROR";
-        counts[status] = (counts[status] || 0) + 1;
+        const status = item?.status;
+        if (counts[status] !== undefined) {
+            counts[status] += 1;
+        } else {
+            counts.ERROR += 1;
+        }
     }
     return counts;
 }
@@ -46,7 +44,6 @@ function DashboardApp() {
         { key: "PASS", label: "PASS", count: statusCounts.PASS, className: "pass" },
         { key: "WARNING", label: "WARNING", count: statusCounts.WARNING, className: "warning" },
         { key: "FAIL", label: "FAIL", count: statusCounts.FAIL, className: "fail" },
-        { key: "PERMISSION REQUIRED", label: "PERMISSION REQUIRED", count: statusCounts["PERMISSION REQUIRED"], className: "permission" },
         { key: "ERROR", label: "UNAVAILABLE", count: statusCounts.ERROR, className: "error" }
     ]), [statusCounts]);
     const totalChecks = results.length;
@@ -54,8 +51,7 @@ function DashboardApp() {
         PASS: "🛡️",
         FAIL: "⚠️",
         WARNING: "🚨",
-        ERROR: "❌",
-        "PERMISSION REQUIRED": "🔒",
+        ERROR: "❌"
     };
 
     const formatDuration = (seconds) => {
@@ -81,8 +77,39 @@ function DashboardApp() {
         return "NOT AVAILABLE";
     };
 
+    const formatDetail = (details) => {
+        if (details === null || details === undefined) {
+            return "No details provided";
+        }
+
+        let text = String(details).trim();
+        if (!text) {
+            return "No details provided";
+        }
+
+        const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+        text = lines[0] || text;
+        text = text.replace(/\s+/g, " ");
+
+        const normalized = text.toLowerCase();
+        if (/sudo: .*password|authentication failed|incorrect password|permission denied|operation not permitted|requires root|must be root/.test(normalized)) {
+            return "Permission denied or requires higher privileges";
+        }
+        if (/no such file or directory|command not found|could not find|missing/.test(normalized)) {
+            return "Required file or command is missing";
+        }
+        if (/not configured|not found/.test(normalized)) {
+            return "Required setting is not configured";
+        }
+        if (/unable to determine firewall status/.test(normalized)) {
+            return "Could not determine firewall status";
+        }
+
+        return text.length > 90 ? `${text.slice(0, 90)}...` : text;
+    };
+
     const sortedResults = useMemo(() => {
-        const order = { FAIL: 1, WARNING: 2, "PERMISSION REQUIRED": 3, ERROR: 4, PASS: 5 };
+        const order = { FAIL: 1, WARNING: 2, ERROR: 3, PASS: 4 };
         return [...results].sort((a, b) => {
             const aStatus = (a.status || "ERROR").toUpperCase();
             const bStatus = (b.status || "ERROR").toUpperCase();
@@ -129,6 +156,9 @@ function DashboardApp() {
         try {
             const response = await fetch("http://127.0.0.1:5000/api/scan", {
                 method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
             });
             if (!response.ok) {
                 throw new Error(`Request failed with status ${response.status}`);
@@ -200,7 +230,6 @@ function DashboardApp() {
                                     <div className="status-item pass">PASS: {statusCounts.PASS}</div>
                                     <div className="status-item warning">WARNING: {statusCounts.WARNING}</div>
                                     <div className="status-item fail">FAIL: {statusCounts.FAIL}</div>
-                                    <div className="status-item permission">PERMISSION REQUIRED: {statusCounts["PERMISSION REQUIRED"]}</div>
                                     <div className="status-item error">UNAVAILABLE: {statusCounts.ERROR}</div>
                                 </div>
                             </section>
@@ -249,19 +278,18 @@ function DashboardApp() {
 
                             <section className="checks-section">
                                 {activeTabResults.map((item, index) => {
-                                    const statusValue = (item.status || "ERROR").toUpperCase();
-                                    const statusClass = statusValue.replace(/\s+/g, "-").toLowerCase();
+                                    const status = (item.status || "ERROR").toLowerCase();
                                     return (
                                         <article className="check-card" key={`${item.name}-${index}`}>
                                             <div className="card-header">
                                                 <h3>{item.name || "Unnamed Check"}</h3>
-                                                <span className={`status-badge status-${statusClass}`}>
-                                                    {statusIconMap[statusValue] || "❔"}
+                                                <span className={`status-badge status-${status}`}>
+                                                    {statusIconMap[(item.status || "ERROR").toUpperCase()] || "❔"}
                                                     {" "}{getStatusLabel(item)}
                                                 </span>
                                             </div>
                                             <p><strong>Risk:</strong> {item.risk || "Unknown"}</p>
-                                            <p><strong>Details:</strong> {item.details || "No details provided"}</p>
+                                            <p><strong>Details:</strong> {formatDetail(item.details)}</p>
                                             <p>
                                                 <strong>Recommendation:</strong>{" "}
                                                 {item.recommendation || "No recommendation provided"}

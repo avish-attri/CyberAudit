@@ -1,4 +1,4 @@
-from scanner.utils import is_permission_error, run_command
+from scanner.utils import run_command
 
 
 def check_open_ports():
@@ -61,15 +61,6 @@ def check_firewall_status():
             "recommendation": "Enable UFW firewall",
         }
 
-    if is_permission_error(ufw_result["error"]):
-        return {
-            "name": "Firewall Status",
-            "status": "PERMISSION REQUIRED",
-            "risk": "Medium",
-            "details": "Unable to check UFW status because root/sudo permissions are required.",
-            "recommendation": "Run the scanner with sufficient privileges to query firewall status.",
-        }
-
     firewalld_result = run_command("firewall-cmd --state")
     if firewalld_result["success"]:
         output = firewalld_result["output"].strip().lower()
@@ -89,20 +80,13 @@ def check_firewall_status():
             "recommendation": "Start and enable firewalld",
         }
 
-    if is_permission_error(firewalld_result["error"]):
-        return {
-            "name": "Firewall Status",
-            "status": "PERMISSION REQUIRED",
-            "risk": "Medium",
-            "details": "Unable to check firewalld status because root/sudo permissions are required.",
-            "recommendation": "Run the scanner with sufficient privileges to query firewall status.",
-        }
-
-    details = ufw_result["error"] or firewalld_result["error"] or "Unable to determine firewall status"
+    details = (
+        ufw_result["error"] or firewalld_result["error"] or "Unable to determine firewall status"
+    )
     return {
         "name": "Firewall Status",
         "status": "WARNING",
         "risk": "Medium",
-        "details": f"Unable to determine firewall status: {details}",
-        "recommendation": "Install or configure UFW or firewalld",
+        "details": details,
+        "recommendation": "Install or configure UFW or firewalld with sudo permissions",
     }

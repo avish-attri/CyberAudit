@@ -26,26 +26,6 @@ def run_command(command):
         }
 
 
-def is_permission_error(message):
-    if not message:
-        return False
-
-    text = message.lower()
-    return any(
-        phrase in text
-        for phrase in [
-            "permission denied",
-            "access denied",
-            "operation not permitted",
-            "requires root",
-            "must be root",
-            "root privileges are required",
-            "you may need to run this command as root",
-            "not authorized",
-        ]
-    )
-
-
 def build_result(check_id, name, status, data):
     normalized = status.upper()
     mapping = {
