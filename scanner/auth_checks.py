@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from scanner.utils import build_result, run_command
+from scanner.utils import build_result, run_command, format_details
 
 
 def check_uid_zero_users():
@@ -38,7 +38,7 @@ def check_uid_zero_users():
             "name": "UID 0 Users",
             "status": "ERROR",
             "risk": "Unknown",
-            "details": str(e),
+            "details": format_details(str(e)),
             "recommendation": "Check file permissions",
         }
 
@@ -72,7 +72,7 @@ def check_ssh_root_login():
             "name": "SSH Root Login",
             "status": "ERROR",
             "risk": "Unknown",
-            "details": str(e),
+            "details": format_details(str(e)),
             "recommendation": "Check SSH configuration",
         }
 
@@ -106,7 +106,7 @@ def check_ssh_password_auth():
             "name": "SSH Password Authentication",
             "status": "ERROR",
             "risk": "Unknown",
-            "details": str(e),
+            "details": format_details(str(e)),
             "recommendation": "Check SSH configuration",
         }
 

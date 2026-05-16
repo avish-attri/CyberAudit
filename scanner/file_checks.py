@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from scanner.utils import build_result, run_command
+from scanner.utils import build_result, run_command, format_details
 
 
 def check_passwd_permissions():
@@ -30,7 +30,7 @@ def check_passwd_permissions():
             "name": "/etc/passwd Permissions",
             "status": "ERROR",
             "risk": "Unknown",
-            "details": str(e),
+            "details": format_details(str(e)),
             "recommendation": "Check file permissions",
         }
 
@@ -61,7 +61,7 @@ def check_shadow_permissions():
             "name": "/etc/shadow Permissions",
             "status": "ERROR",
             "risk": "Unknown",
-            "details": str(e),
+            "details": format_details(str(e)),
             "recommendation": "Run with proper permissions",
         }
 
@@ -77,7 +77,7 @@ def check_world_writable_files():
             "name": "World Writable Files",
             "status": "ERROR",
             "risk": "Unknown",
-            "details": result["error"],
+            "details": format_details(result.get("error")),
             "recommendation": "Check find command",
         }
 

@@ -1,7 +1,7 @@
 import shutil
 import subprocess
 
-from scanner.utils import build_result, run_command
+from scanner.utils import build_result, run_command, format_details
 
 
 def check_kernel_version():
@@ -14,7 +14,7 @@ def check_kernel_version():
             "name": "Kernel Version",
             "status": "ERROR",
             "risk": "Unknown",
-            "details": result["error"],
+            "details": format_details(result.get("error")),
             "recommendation": "Check uname command",
         }
 
@@ -37,7 +37,7 @@ def check_pending_updates():
             "name": "Pending Updates",
             "status": "ERROR",
             "risk": "Unknown",
-            "details": result["error"],
+            "details": format_details(result.get("error")),
             "recommendation": "Check package manager",
         }
 

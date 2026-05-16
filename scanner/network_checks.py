@@ -1,4 +1,4 @@
-from scanner.utils import run_command
+from scanner.utils import run_command, format_details
 
 
 def check_open_ports():
@@ -11,7 +11,7 @@ def check_open_ports():
             "name": "Open Ports",
             "status": "ERROR",
             "risk": "Unknown",
-            "details": result["error"],
+            "details": format_details(result.get("error")),
             "recommendation": "Check ss command",
         }
 
@@ -81,12 +81,12 @@ def check_firewall_status():
         }
 
     details = (
-        ufw_result["error"] or firewalld_result["error"] or "Unable to determine firewall status"
+        ufw_result.get("error") or firewalld_result.get("error") or "Unable to determine firewall status"
     )
     return {
         "name": "Firewall Status",
         "status": "WARNING",
         "risk": "Medium",
-        "details": details,
+        "details": format_details(details),
         "recommendation": "Install or configure UFW or firewalld with sudo permissions",
     }
