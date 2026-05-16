@@ -27,6 +27,32 @@ def run_command(command):
 
 
 def build_result(check_id, name, status, data):
+    def format_data_details(data_value):
+        if isinstance(data_value, dict):
+            if data_value.get("reason"):
+                return str(data_value.get("reason"))
+            if data_value.get("error"):
+                return str(data_value.get("error"))
+            if data_value.get("details"):
+                return str(data_value.get("details"))
+            if "used_percent" in data_value and "free_gb" in data_value:
+                return f"{data_value['used_percent']}% used, {data_value['free_gb']} GB free"
+            if "security_updates_count" in data_value:
+                count = data_value["security_updates_count"]
+                return "No security updates available" if count == 0 else f"{count} security update(s) available"
+            if data_value.get("count") is not None and data_value.get("sample") is not None:
+                count = data_value["count"]
+                sample_values = data_value["sample"]
+                sample_text = ", ".join(str(x) for x in sample_values[:5])
+                return f"{count} items found. Sample: {sample_text}"
+            return ", ".join(
+                f"{key.replace("_", " ").capitalize()}: {value}"
+                for key, value in data_value.items()
+            )
+        if isinstance(data_value, list):
+            return ", ".join(str(x) for x in data_value[:5])
+        return str(data_value)
+
     normalized = status.upper()
     mapping = {
         "WARN": "WARNING",
@@ -43,7 +69,7 @@ def build_result(check_id, name, status, data):
         "ERROR": "Unknown",
     }
 
-    details = data.get("reason") or data.get("error") or data.get("details") or str(data)
+    details = data.get("reason") or data.get("error") or data.get("details") or format_data_details(data)
     recommendation = "Review system configuration"
     if normalized == "FAIL":
         recommendation = "Remediate the identified security issue"
