@@ -46,12 +46,3 @@ def check_failed_logins():
                 "error": str(e),
             },
         )
-
-    return build_result(
-        "LOG-FAILED-LOGINS",
-        "Failed Login Attempts",
-        status,
-        {
-            "failed_login_count": failed_count,
-        },
-    )
