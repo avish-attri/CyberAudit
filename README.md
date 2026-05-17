@@ -2,6 +2,8 @@
 
 Simple Linux security scanner with Flask API.
 
+source /venv/bin/activate
+
 ## Install
 
 pip install -r requirements.txt
