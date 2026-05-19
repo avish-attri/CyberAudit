@@ -165,6 +165,7 @@ button:disabled {
 
 .results-output {
     margin-top: 18px;
+    margin-bottom: 18px;
 }
 
 .summary-card {
@@ -193,6 +194,75 @@ button:disabled {
     flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 16px;
+}
+
+.collapsible-panel {
+    background: var(--panel-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.collapsible-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+}
+
+.collapsible-toggle:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.collapsible-toggle span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    background: rgba(96, 165, 250, 0.14);
+    color: var(--accent);
+    font-size: 0.95rem;
+}
+
+.collapsible-panel h2 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.collapsible-subtitle {
+    margin: 6px 0 0;
+    color: var(--text-soft);
+    font-size: 0.92rem;
+}
+
+.collapse-content {
+    padding: 0 20px 18px;
+}
+
+.checks-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 10px;
+}
+
+.check-list-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-size: 0.95rem;
 }
 
 .tab-btn {

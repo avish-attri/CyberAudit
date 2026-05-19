@@ -21,11 +21,23 @@ function DashboardApp() {
 
     const getRouteFromPath = () => {
         const path = window.location.pathname.replace(/\/+$/, "");
-        return path === "/scan-result" || path === "/scan-results" ? "result" : "scan";
+        return path === "/scan-results" ? "result" : "scan";
     };
 
     const [route, setRoute] = useState(getRouteFromPath);
     const [activeTab, setActiveTab] = useState("high");
+    const [isChecksOpen, setIsChecksOpen] = useState(true);
+
+    const availableChecks = [
+        "Authentication and User Configuration",
+        "File and Directory Permissions",
+        "Service Validation",
+        "Network and Port Security",
+        "Log Configuration",
+        "System Integrity and Package Status",
+        "Firewall and Access Controls",
+        "Sudo and Privilege Restrictions",
+    ];
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", "dark");
@@ -301,6 +313,33 @@ function DashboardApp() {
                         </>
                     )}
                 </div>
+
+                {route === "scan" && (
+                    <section className="collapsible-panel">
+                        <button
+                            type="button"
+                            className="collapsible-toggle"
+                            onClick={() => setIsChecksOpen((prev) => !prev)}
+                        >
+                            <span>{isChecksOpen ? "▼" : "▶"}</span>
+                            <div>
+                                <h2>Available Scan Checks</h2>
+                                {!isChecksOpen && (
+                                    <p className="collapsible-subtitle">Expand to preview the checks performed during a scan.</p>
+                                )}
+                            </div>
+                        </button>
+                        {isChecksOpen && (
+                            <div className="collapse-content">
+                                <ul className="checks-list">
+                                    {availableChecks.map((check) => (
+                                        <li className="check-list-item" key={check}>{check}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </section>
+                )}
         </div>
     );
 }

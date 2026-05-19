@@ -22,6 +22,9 @@ python app.py
 ## Frontend Routes
 
 - GET /scan
-- GET /scan-result
+- GET /scan-results
 
-sudo fuser -k 5000/tcp
+
+### If port 5000 is busy, kill it by:
+
+- sudo fuser -k 5000/tcp 
