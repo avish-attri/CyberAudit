@@ -289,26 +289,32 @@ function DashboardApp() {
                             </section>
 
                             <section className="checks-section">
-                                {activeTabResults.map((item, index) => {
-                                    const status = (item.status || "ERROR").toLowerCase();
-                                    return (
-                                        <article className="check-card" key={`${item.name}-${index}`}>
-                                            <div className="card-header">
-                                                <h3>{item.name || "Unnamed Check"}</h3>
-                                                <span className={`status-badge status-${status}`}>
-                                                    {statusIconMap[(item.status || "ERROR").toUpperCase()] || "❔"}
-                                                    {" "}{getStatusLabel(item)}
-                                                </span>
-                                            </div>
-                                            <p><strong>Risk:</strong> {item.risk || "Unknown"}</p>
-                                            <p><strong>Details:</strong> {formatDetail(item.details)}</p>
-                                            <p>
-                                                <strong>Recommendation:</strong>{" "}
-                                                {item.recommendation || "No recommendation provided"}
-                                            </p>
-                                        </article>
-                                    );
-                                })}
+                                {activeTabResults.length === 0 ? (
+                                    <div className="empty-state">
+                                        <p>No checks found for this category! </p>
+                                    </div>
+                                ) : (
+                                    activeTabResults.map((item, index) => {
+                                        const status = (item.status || "ERROR").toLowerCase();
+                                        return (
+                                            <article className="check-card" key={`${item.name}-${index}`}>
+                                                <div className="card-header">
+                                                    <h3>{item.name || "Unnamed Check"}</h3>
+                                                    <span className={`status-badge status-${status}`}>
+                                                        {statusIconMap[(item.status || "ERROR").toUpperCase()] || "❔"}
+                                                        {" "}{getStatusLabel(item)}
+                                                    </span>
+                                                </div>
+                                                <p><strong>Risk:</strong> {item.risk || "Unknown"}</p>
+                                                <p><strong>Details:</strong> {formatDetail(item.details)}</p>
+                                                <p>
+                                                    <strong>Recommendation:</strong>{" "}
+                                                    {item.recommendation || "No recommendation provided"}
+                                                </p>
+                                            </article>
+                                        );
+                                    })
+                                )}
                             </section>
                         </>
                     )}
