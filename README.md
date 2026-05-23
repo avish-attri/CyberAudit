@@ -2,17 +2,22 @@
 
 Simple Linux security scanner with Flask API.
 
-python3 pm venv venv
-source /venv/bin/activate
+## Setup
+
+python3 -m venv venv
+source venv/bin/activate
 
 ## Install
 
 pip install -r requirements.txt
 
-## Run API
+## Run
 
 python app.py
 
+Then open:
+
+- http://127.0.0.1:5000/scan
 
 ## API Endpoints
 
@@ -23,7 +28,6 @@ python app.py
 
 - GET /scan
 - GET /scan-results
-
 
 ### If port 5000 is busy, kill it by:
 
