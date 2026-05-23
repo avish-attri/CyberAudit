@@ -29,8 +29,5 @@ def serve_frontend_file(filename):
 
 
 if __name__ == "__main__":
-    print("Starting Linux Security Audit Tool...")
-    print("Frontend routes available:")
-    print("  http://127.0.0.1:5000/scan  -> Scan page")
-    print("  http://127.0.0.1:5000/scan-results  -> Results page")
-    app.run(debug=True)
+    print("Starting Linux Security Audit Tool on http://127.0.0.1:5000/scan")
+    app.run(host="127.0.0.1", port=5000, debug=False)
