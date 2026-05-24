@@ -31,7 +31,6 @@ function DashboardApp() {
     const availableChecks = [
         "Authentication and User Configuration",
         "File and Directory Permissions",
-        "Service Validation",
         "Network and Port Security",
         "Log Configuration",
         "System Integrity and Package Status",
