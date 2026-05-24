@@ -12,7 +12,6 @@ app.register_blueprint(api_bp)
 
 FRONTEND_DIR = Path(__file__).resolve().parent / "frontend"
 
-
 @app.route("/scan", methods=["GET"])
 def serve_scan():
     return send_from_directory(FRONTEND_DIR, "index.html")

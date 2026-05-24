@@ -7,7 +7,7 @@ api_bp = Blueprint("api", __name__)
 latest_report = {}
 
 
-@api_bp.route("/api/scan", methods=["POST"])
+@api_bp.route("/api/scan", methods=["POST"])    
 def run_scan():
     global latest_report
     latest_report = build_scan_report()
