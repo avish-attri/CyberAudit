@@ -21,14 +21,6 @@ def check_open_ports():
     ]
 
     port_count = len(services)
-    ports = []
-
-    for line in services:
-        parts = line.split()
-
-        # Local Address:Port column
-        if len(parts) >= 5:
-            ports.append(parts[4])
 
     status = "PASS"
 
@@ -43,15 +35,12 @@ def check_open_ports():
         "Open Ports",
         status,
         {
-            "count": port_count,
-            "sample": ports[:5],
+            "details": f"{port_count} listening ports detected"
         },
     )
 
 def check_firewall_status():
-    """
-    Check whether a supported firewall is active.
-    """
+
     ufw_result = run_command("ufw status")
     if ufw_result["success"]:
         output = ufw_result["output"].lower()
