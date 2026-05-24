@@ -94,22 +94,25 @@ def check_firewall_status():
 
     ufw_result = run_command("ufw status")
 
+    ufw_output = (
+        ufw_result.get("output", "") +
+        ufw_result.get("error", "")
+    ).lower()
+
+    if "you need to be root" in ufw_output or "permission denied" in ufw_output:
+
+        return build_result(
+            "NETWORK-FIREWALL",
+            "Firewall Status",
+            "WARNING",
+            {
+                "details": "Firewall status requires root privileges"
+            },
+        )
+
     if ufw_result["success"]:
 
-        output = ufw_result["output"].lower()
-
-        if "you need to be root" in output or "permission denied" in output:
-
-            return build_result(
-                "NETWORK-FIREWALL",
-                "Firewall Status",
-                "WARNING",
-                {
-                    "details": "Firewall status requires root privileges"
-                },
-            )
-
-        if "status: active" in output:
+        if "status: active" in ufw_output:
 
             return build_result(
                 "NETWORK-FIREWALL",
@@ -120,7 +123,7 @@ def check_firewall_status():
                 },
             )
 
-        if "inactive" in output:
+        if "inactive" in ufw_output:
 
             return build_result(
                 "NETWORK-FIREWALL",
@@ -133,11 +136,14 @@ def check_firewall_status():
 
     firewalld_result = run_command("firewall-cmd --state")
 
+    firewalld_output = (
+        firewalld_result.get("output", "") +
+        firewalld_result.get("error", "")
+    ).lower()
+
     if firewalld_result["success"]:
 
-        output = firewalld_result["output"].strip().lower()
-
-        if output == "running":
+        if "running" in firewalld_output:
 
             return build_result(
                 "NETWORK-FIREWALL",
