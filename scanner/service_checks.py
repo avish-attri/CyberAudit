@@ -33,8 +33,7 @@ def check_ssh_service():
                         "status": status_output,
                     },
                 )
-
-            # If the service unit is not present, try the next common unit name.
+            
             if status_output == "unknown":
                 continue
 

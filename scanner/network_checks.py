@@ -1,42 +1,52 @@
-from scanner.utils import run_command, format_details
-
+from scanner.utils import run_command, format_details, build_result
 
 def check_open_ports():
-    """
-    Detect open listening ports.
-    """
-    result = run_command("ss -tuln")
+
+    result = run_command("ss -tulnp")
+
     if not result["success"]:
-        return {
-            "name": "Open Ports",
-            "status": "ERROR",
-            "risk": "Unknown",
-            "details": format_details(result.get("error")),
-            "recommendation": "Check ss command",
-        }
 
-    output = result["output"]
-    lines = output.split("\n")
-    port_count = max(len(lines) - 1, 0)
+        return build_result(
+            "NETWORK-OPEN-PORTS",
+            "Open Ports",
+            "ERROR",
+            {
+                "error": result.get("error")
+            }
+        )
 
-    if port_count <= 5:
-        status = "PASS"
-        risk = "Low"
-    elif port_count <= 10:
-        status = "WARNING"
-        risk = "Medium"
-    else:
+    services = [
+        line for line in result["output"].splitlines()
+        if "LISTEN" in line
+    ]
+
+    port_count = len(services)
+    ports = []
+
+    for line in services:
+        parts = line.split()
+
+        # Local Address:Port column
+        if len(parts) >= 5:
+            ports.append(parts[4])
+
+    status = "PASS"
+
+    if port_count > 10:
         status = "FAIL"
-        risk = "High"
 
-    return {
-        "name": "Open Ports",
-        "status": status,
-        "risk": risk,
-        "details": f"Detected {port_count} listening ports",
-        "recommendation": "Close unnecessary ports",
-    }
+    elif port_count > 5:
+        status = "WARNING"
 
+    return build_result(
+        "NETWORK-OPEN-PORTS",
+        "Open Ports",
+        status,
+        {
+            "count": port_count,
+            "sample": ports[:5],
+        },
+    )
 
 def check_firewall_status():
     """
