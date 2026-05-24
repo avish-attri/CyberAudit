@@ -81,23 +81,24 @@ def check_running_services():
             text=True,
         )
 
-        if not result["success"]:
+        if result.returncode != 0:
             return build_result(
                 "SERVICE-RUNNING-COUNT",
                 "Running Services Count",
                 "ERROR",
                 {
-                    "error": result.get("error")
+                    "error": result.stderr
                 }
             )
 
         services = [
-            line for line in result["output"].splitlines()
+            line for line in result.stdout.splitlines()
             if ".service" in line
         ]
 
         count = len(services)
         status = "PASS"
+
         if count > 150:
             status = "WARNING"
 
