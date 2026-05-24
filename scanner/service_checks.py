@@ -1,7 +1,5 @@
 import subprocess
-
 from scanner.utils import build_result
-
 
 def check_ssh_service():
     for unit in ("ssh", "sshd"):
@@ -69,8 +67,8 @@ def check_ssh_service():
         },
     )
 
-
 def check_running_services():
+
     try:
         result = subprocess.run(
             [
@@ -83,26 +81,42 @@ def check_running_services():
             text=True,
         )
 
-        services = result.stdout.splitlines()
-        count = len(services)
-        status = "pass"
+        if not result["success"]:
+            return build_result(
+                "SERVICE-RUNNING-COUNT",
+                "Running Services Count",
+                "ERROR",
+                {
+                    "error": result.get("error")
+                }
+            )
 
+        services = [
+            line for line in result["output"].splitlines()
+            if ".service" in line
+        ]
+
+        count = len(services)
+        status = "PASS"
         if count > 150:
-            status = "warn"
+            status = "WARNING"
 
         return build_result(
             "SERVICE-RUNNING-COUNT",
             "Running Services Count",
             status,
             {
-                "running_services": count,
+                "count": count,
+                "sample": services[:5],
             },
         )
+
     except Exception as e:
+
         return build_result(
             "SERVICE-RUNNING-COUNT",
             "Running Services Count",
-            "unknown",
+            "ERROR",
             {
                 "error": str(e),
             },

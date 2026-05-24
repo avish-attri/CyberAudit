@@ -48,33 +48,38 @@ def check_kernel_version():
 def check_pending_updates():
 
     result = run_command("apt list --upgradable 2>/dev/null")
+
     if not result["success"]:
-        return {
-            "name": "Pending Updates",
-            "status": "ERROR",
-            "risk": "Unknown",
-            "details": format_details(result.get("error")),
-            "recommendation": "Check package manager",
-        }
+        return build_result(
+            "SYS-UPDATES",
+            "Pending Updates",
+            "ERROR",
+            {
+                "error": result.get("error")
+            }
+        )
 
     lines = result["output"].split("\n")
     updates = max(len(lines) - 1, 0)
-    if updates == 0:
-        return {
-            "name": "Pending Updates",
-            "status": "PASS",
-            "risk": "Low",
-            "details": "System is up to date",
-            "recommendation": "No action needed",
-        }
-    return {
-        "name": "Pending Updates",
-        "status": "WARNING",
-        "risk": "Medium",
-        "details": f"{updates} packages can be upgraded",
-        "recommendation": "Install latest security updates",
-    }
 
+    if updates == 0:
+        return build_result(
+            "SYS-UPDATES",
+            "Pending Updates",
+            "PASS",
+            {
+                "details": "System is up to date"
+            }
+        )
+
+    return build_result(
+        "SYS-UPDATES",
+        "Pending Updates",
+        "WARNING",
+        {
+            "details": f"{updates} packages can be upgraded"
+        }
+    )
 
 def check_disk_usage():
     total, used, free = shutil.disk_usage("/")
