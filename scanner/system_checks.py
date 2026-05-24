@@ -3,34 +3,50 @@ import subprocess
 
 from scanner.utils import build_result, run_command, format_details
 
+LATEST_KERNEL = "6.8.0"
 
 def check_kernel_version():
-    """
-    Get Linux kernel version.
-    """
-    result = run_command("uname -r")
-    if not result["success"]:
-        return {
-            "name": "Kernel Version",
-            "status": "ERROR",
-            "risk": "Unknown",
-            "details": format_details(result.get("error")),
-            "recommendation": "Check uname command",
-        }
 
-    return {
-        "name": "Kernel Version",
-        "status": "PASS",
-        "risk": "Low",
-        "details": f"Kernel version: {result['output']}",
-        "recommendation": "Keep kernel updated",
-    }
+    result = run_command("uname -r")
+
+    if not result["success"]:
+        return build_result(
+            "SYS-KERNEL",
+            "Kernel Version",
+            "ERROR",
+            {
+                "error": result.get("error")
+            }
+        )
+
+    current_kernel = result["output"].split("-")[0]
+
+    current_parts = [int(x) for x in current_kernel.split(".")]
+    latest_parts = [int(x) for x in LATEST_KERNEL.split(".")]
+
+    if current_parts < latest_parts:
+
+        return build_result(
+            "SYS-KERNEL",
+            "Kernel Version",
+            "WARNING",
+            {
+                "details": f"Installed kernel {current_kernel} is older than recommended version {LATEST_KERNEL}"
+            }
+        )
+
+    return build_result(
+        "SYS-KERNEL",
+        "Kernel Version",
+        "PASS",
+        {
+            "details": f"Installed kernel version: {current_kernel}"
+        }
+    )
 
 
 def check_pending_updates():
-    """
-    Check for pending package updates.
-    """
+
     result = run_command("apt list --upgradable 2>/dev/null")
     if not result["success"]:
         return {

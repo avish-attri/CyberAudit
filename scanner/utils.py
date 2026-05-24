@@ -1,11 +1,7 @@
 import subprocess
 import re
 
-
 def run_command(command):
-    """
-    Runs a shell command safely and returns output.
-    """
     try:
         result = subprocess.run(
             command,
@@ -28,15 +24,10 @@ def run_command(command):
 
 
 def format_details(data_value):
-    """Normalize various detail types into a short, English sentence.
 
-    Accepts strings, dicts, lists, exceptions, or other values and returns
-    a readable one-line summary suitable for UI cards.
-    """
     if data_value is None:
         return "No details provided"
 
-    # If it's already an error/result dict returned by run_command
     if isinstance(data_value, dict):
         # prefer explicit fields
         if data_value.get("reason"):
@@ -102,8 +93,7 @@ def format_details(data_value):
 
 
 def build_result(check_id, name, status, data):
-    # reuse shared formatter for data -> short details
-
+    
     normalized = status.upper()
     mapping = {
         "WARN": "WARNING",
