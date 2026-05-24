@@ -1,13 +1,8 @@
 import os
 import subprocess
-
 from scanner.utils import build_result, run_command, format_details
 
-
 def check_passwd_permissions():
-    """
-    Check permissions of /etc/passwd.
-    """
     try:
         permissions = oct(os.stat("/etc/passwd").st_mode)[-3:]
         if permissions == "644":
@@ -36,9 +31,6 @@ def check_passwd_permissions():
 
 
 def check_shadow_permissions():
-    """
-    Check permissions of /etc/shadow.
-    """
     try:
         permissions = oct(os.stat("/etc/shadow").st_mode)[-3:]
         if permissions == "640":
@@ -67,9 +59,6 @@ def check_shadow_permissions():
 
 
 def check_world_writable_files():
-    """
-    Find world-writable files inside /home.
-    """
     command = "find /home -type f -perm -0002 2>/dev/null | head"
     result = run_command(command)
     if not result["success"]:

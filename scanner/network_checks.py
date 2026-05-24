@@ -39,57 +39,6 @@ def check_open_ports():
         },
     )
 
-# def check_firewall_status():
-
-#     ufw_result = run_command("ufw status")
-#     if ufw_result["success"]:
-#         output = ufw_result["output"].lower()
-#         if "status: active" in output or "active" in output:
-#             return {
-#                 "name": "Firewall Status",
-#                 "status": "PASS",
-#                 "risk": "Low",
-#                 "details": "UFW firewall is active",
-#                 "recommendation": "No action needed",
-#             }
-#         return {
-#             "name": "Firewall Status",
-#             "status": "FAIL",
-#             "risk": "High",
-#             "details": "UFW firewall is inactive",
-#             "recommendation": "Enable UFW firewall",
-#         }
-
-#     firewalld_result = run_command("firewall-cmd --state")
-#     if firewalld_result["success"]:
-#         output = firewalld_result["output"].strip().lower()
-#         if output == "running":
-#             return {
-#                 "name": "Firewall Status",
-#                 "status": "PASS",
-#                 "risk": "Low",
-#                 "details": "firewalld is running",
-#                 "recommendation": "No action needed",
-#             }
-#         return {
-#             "name": "Firewall Status",
-#             "status": "FAIL",
-#             "risk": "High",
-#             "details": "firewalld is not running",
-#             "recommendation": "Start and enable firewalld",
-#         }
-
-#     details = (
-#         ufw_result.get("error") or firewalld_result.get("error") or "Unable to determine firewall status"
-#     )
-#     return {
-#         "name": "Firewall Status",
-#         "status": "WARNING",
-#         "risk": "Medium",
-#         "details": format_details(details),
-#         "recommendation": "Install or configure UFW or firewalld with sudo permissions",
-#     }
-
 def check_firewall_status():
 
     ufw_result = run_command("ufw status")

@@ -1,12 +1,7 @@
 from pathlib import Path
-
 from scanner.utils import build_result, run_command, format_details
 
-
 def check_uid_zero_users():
-    """
-    Detect users with UID 0.
-    """
     try:
         users = []
         with open("/etc/passwd", "r", encoding="utf-8") as f:
@@ -44,9 +39,6 @@ def check_uid_zero_users():
 
 
 def check_ssh_root_login():
-    """
-    Check if SSH root login is enabled.
-    """
     try:
         with open("/etc/ssh/sshd_config", "r", encoding="utf-8") as f:
             data = f.read()
@@ -78,9 +70,6 @@ def check_ssh_root_login():
 
 
 def check_ssh_password_auth():
-    """
-    Check if password authentication is enabled.
-    """
     try:
         with open("/etc/ssh/sshd_config", "r", encoding="utf-8") as f:
             data = f.read()

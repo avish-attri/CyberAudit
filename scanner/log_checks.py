@@ -1,7 +1,5 @@
 from pathlib import Path
-
 from scanner.utils import build_result
-
 
 def check_failed_logins():
     log_path = Path("/var/log/auth.log")
@@ -37,6 +35,7 @@ def check_failed_logins():
                 "failed_login_count": failed_count,
             },
         )
+    
     except Exception as e:
         return build_result(
             "LOG-FAILED-LOGINS",
