@@ -1,6 +1,6 @@
-# Linux Security Audit Tool
+# Security Audit Tool
 
-A modular Linux security auditing dashboard built using Python, Flask, React, and JavaScript.
+A modular security auditing dashboard built using Python, Flask, React, and JavaScript.
 
 The tool performs automated Linux security checks and displays findings through a modern web dashboard.
 
@@ -8,7 +8,7 @@ The tool performs automated Linux security checks and displays findings through 
 
 ## Features
 
-- Linux security auditing
+- security auditing
 - Real-time scan dashboard
 - Modular scanner architecture
 - Risk-level filtering
@@ -251,7 +251,7 @@ GET /api/scan-results
 1. Launch application
 2. Open dashboard in browser
 3. Click "Run Scan"
-4. Scanner performs Linux security audit
+4. Scanner performs security audit
 5. Results displayed in dashboard
 
 ---

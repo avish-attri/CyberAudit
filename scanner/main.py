@@ -1,5 +1,9 @@
 import socket
 import time
+import uuid
+import platform
+import subprocess
+import re
 
 from scanner.auth_checks import (
     check_uid_zero_users,
@@ -43,6 +47,45 @@ def get_local_ip():
         return "127.0.0.1"
 
 
+import platform
+import subprocess
+import uuid
+
+def get_local_mac():
+
+    if platform.system() == "Windows":
+
+        try:
+            result = subprocess.run(
+                "getmac",
+                capture_output=True,
+                text=True,
+                shell=True,
+            )
+
+            for line in result.stdout.splitlines():
+
+                parts = line.strip().split()
+
+                if len(parts) > 0 and "-" in parts[0]:
+                    return parts[0].replace("-", ":")
+
+        except Exception:
+            pass
+
+        return "-"
+
+    try:
+        mac = uuid.getnode()
+
+        return ":".join(
+            f"{(mac >> shift) & 0xFF:02X}"
+            for shift in range(40, -1, -8)
+        )
+
+    except Exception:
+        return "-"
+
 def run_all_checks():
     results = []
     results.append(check_uid_zero_users())
@@ -77,5 +120,6 @@ def build_scan_report():
         "score": score,
         "results": results,
         "host_ip": get_local_ip(),
+        "host_mac": get_local_mac(),
         "duration_seconds": round(duration_seconds, 2),
     }

@@ -100,6 +100,7 @@ def build_result(check_id, name, status, data):
         "PASS": "PASS",
         "FAIL": "FAIL",
         "UNKNOWN": "ERROR",
+        "NOT_AVAILABLE": "NOT_AVAILABLE",
     }
     normalized = mapping.get(normalized, normalized)
 
@@ -108,6 +109,7 @@ def build_result(check_id, name, status, data):
         "WARNING": "Medium",
         "FAIL": "High",
         "ERROR": "Unknown",
+        "NOT_AVAILABLE": "Unknown",
     }
 
     details = data.get("reason") or data.get("error") or data.get("details") or format_details(data)
@@ -120,6 +122,8 @@ def build_result(check_id, name, status, data):
         recommendation = "Check the system state and rerun the check"
     elif normalized == "PASS":
         recommendation = "No action needed"
+    elif normalized == "NOT_AVAILABLE":
+        recommendation = "Not applicable on this operating system"
 
     return {
         "id": check_id,
@@ -130,3 +134,13 @@ def build_result(check_id, name, status, data):
         "recommendation": recommendation,
         "data": data,
     }
+
+def not_available_result(check_id, name):
+    return build_result(
+        check_id,
+        name,
+        "NOT_AVAILABLE",
+        {
+            "details": "This security check is Linux-specific",
+        },
+    )

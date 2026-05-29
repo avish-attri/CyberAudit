@@ -1,7 +1,14 @@
 from pathlib import Path
-from scanner.utils import build_result, run_command, format_details
+from scanner.utils import build_result, run_command, format_details, not_available_result
+import platform
 
-def check_uid_zero_users():
+def check_uid_zero_users():    
+    if platform.system() == "Windows":
+        return not_available_result(
+            "AUTH-UID0-USERS",
+            "UID 0 Users",
+        )
+    
     try:
         users = []
         with open("/etc/passwd", "r", encoding="utf-8") as f:
@@ -39,6 +46,12 @@ def check_uid_zero_users():
 
 
 def check_ssh_root_login():
+    if platform.system() == "Windows":
+        return not_available_result(
+            "AUTH-SSH-ROOT",
+            "SSH Root Login",
+        )
+    
     try:
         with open("/etc/ssh/sshd_config", "r", encoding="utf-8") as f:
             data = f.read()
@@ -70,6 +83,12 @@ def check_ssh_root_login():
 
 
 def check_ssh_password_auth():
+    if platform.system() == "Windows":
+        return not_available_result(
+            "AUTH-SSH-PASSWORD",
+            "SSH Password Authentication",
+        )
+    
     try:
         with open("/etc/ssh/sshd_config", "r", encoding="utf-8") as f:
             data = f.read()
@@ -101,6 +120,46 @@ def check_ssh_password_auth():
 
 
 def check_guest_account():
+    if platform.system() == "Windows":
+
+        result = run_command("net user Guest")
+
+        if not result["success"]:
+
+            return build_result(
+                "AUTH-GUEST-ACCOUNT",
+                "Guest Account Check",
+                "UNKNOWN",
+                {
+                    "error": result.get("error"),
+                },
+            )
+
+        output = result["output"].lower()
+
+        if (
+            "account active" in output
+            and "yes" in output
+        ):
+
+            return build_result(
+                "AUTH-GUEST-ACCOUNT",
+                "Guest Account Check",
+                "FAIL",
+                {
+                    "details": "Guest account is enabled",
+                },
+            )
+
+        return build_result(
+            "AUTH-GUEST-ACCOUNT",
+            "Guest Account Check",
+            "PASS",
+            {
+                "details": "Guest account is disabled",
+            },
+        )
+    
     passwd_path = Path("/etc/passwd")
 
     if not passwd_path.exists():
@@ -142,6 +201,58 @@ def check_guest_account():
 
 
 def check_password_policy():
+    if platform.system() == "Windows":
+
+        result = run_command("net accounts")
+
+        if not result["success"]:
+
+            return build_result(
+                "AUTH-PASSWORD-POLICY",
+                "Password Expiry Policy",
+                "UNKNOWN",
+                {
+                    "error": result.get("error"),
+                },
+            )
+
+        output = result["output"]
+
+        max_age = None
+
+        for line in output.splitlines():
+
+            if "maximum password age" in line.lower():
+
+                try:
+                    max_age = int(
+                        "".join(
+                            c for c in line
+                            if c.isdigit()
+                        )
+                    )
+                except Exception:
+                    pass
+
+                break
+
+        status = "PASS"
+
+        if max_age is None:
+            status = "UNKNOWN"
+
+        elif max_age > 90:
+            status = "WARNING"
+
+        return build_result(
+            "AUTH-PASSWORD-POLICY",
+            "Password Expiry Policy",
+            status,
+            {
+                "pass_max_days": max_age,
+            },
+        )
+     
     config = Path("/etc/login.defs")
 
     if not config.exists():
@@ -194,34 +305,115 @@ def check_password_policy():
 
 
 def check_empty_password_accounts():
+
+    if platform.system() == "Windows":
+
+        result = run_command(
+            "net accounts"
+        )
+
+        if not result["success"]:
+
+            return build_result(
+                "AUTH-EMPTY-PASSWORDS",
+                "Empty Password Accounts",
+                "UNKNOWN",
+                {
+                    "details":
+                    "Unable to determine password policy"
+                },
+            )
+
+        output = result["output"]
+
+        min_length = None
+
+        for line in output.splitlines():
+
+            if "minimum password length" in line.lower():
+
+                try:
+                    min_length = int(
+                        line.split()[-1]
+                    )
+                except Exception:
+                    pass
+
+                break
+
+        if min_length is None:
+
+            return build_result(
+                "AUTH-EMPTY-PASSWORDS",
+                "Empty Password Accounts",
+                "UNKNOWN",
+                {
+                    "details":
+                    "Unable to determine password policy"
+                },
+            )
+
+        if min_length == 0:
+
+            return build_result(
+                "AUTH-EMPTY-PASSWORDS",
+                "Empty Password Accounts",
+                "FAIL",
+                {
+                    "details":
+                    "Windows allows empty passwords"
+                },
+            )
+
+        return build_result(
+            "AUTH-EMPTY-PASSWORDS",
+            "Empty Password Accounts",
+            "PASS",
+            {
+                "details":
+                f"Minimum password length is {min_length}"
+            },
+        )
+
     shadow = Path("/etc/shadow")
 
     if not shadow.exists():
         return build_result(
             "AUTH-EMPTY-PASSWORDS",
             "Empty Password Accounts",
-            "unknown",
+            "UNKNOWN",
             {
                 "reason": "/etc/shadow missing",
             },
         )
 
     try:
+
         empty_accounts = []
-        with shadow.open("r", encoding="utf-8", errors="ignore") as file:
+
+        with shadow.open(
+            "r",
+            encoding="utf-8",
+            errors="ignore",
+        ) as file:
+
             for line in file:
+
                 parts = line.strip().split(":")
+
                 if len(parts) < 2:
                     continue
 
                 username = parts[0]
                 password_field = parts[1]
+
                 if password_field == "":
                     empty_accounts.append(username)
 
-        status = "pass"
+        status = "PASS"
+
         if empty_accounts:
-            status = "fail"
+            status = "FAIL"
 
         return build_result(
             "AUTH-EMPTY-PASSWORDS",
@@ -232,11 +424,13 @@ def check_empty_password_accounts():
                 "count": len(empty_accounts),
             },
         )
+
     except Exception as e:
+
         return build_result(
             "AUTH-EMPTY-PASSWORDS",
             "Empty Password Accounts",
-            "unknown",
+            "UNKNOWN",
             {
                 "error": str(e),
             },

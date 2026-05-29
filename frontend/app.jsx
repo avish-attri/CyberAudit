@@ -1,5 +1,17 @@
 const { useEffect, useMemo, useState } = React;
 
+const API_BASE = "http://127.0.0.1:5000";
+
+async function parseJsonResponse(response) {
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+        throw new Error(
+            "Server returned an invalid response. Start the Flask app with python app.py and try again."
+        );
+    }
+    return response.json();
+}
+
 function countStatuses(results) {
     const counts = { PASS: 0, WARNING: 0, FAIL: 0, ERROR: 0 };
     for (const item of results) {
@@ -27,6 +39,8 @@ function DashboardApp() {
     const [route, setRoute] = useState(getRouteFromPath);
     const [activeTab, setActiveTab] = useState("high");
     const [isChecksOpen, setIsChecksOpen] = useState(true);
+    const [isSavingPdf, setIsSavingPdf] = useState(false);
+    const [pdfMessage, setPdfMessage] = useState("");
 
     const availableChecks = [
         "Authentication and User Configuration",
@@ -62,7 +76,8 @@ function DashboardApp() {
         PASS: "🛡️",
         FAIL: "⚠️",
         WARNING: "🚨",
-        ERROR: "❌"
+        ERROR: "❌",
+        NOT_AVAILABLE: "❌"
     };
 
     const formatDuration = (seconds) => {
@@ -161,11 +176,40 @@ function DashboardApp() {
         setRoute(getRouteFromPath());
     };
 
+    async function saveAsPdf() {
+        if (!report) {
+            return;
+        }
+
+        setActiveTab("all");
+        setPdfMessage("");
+        setIsSavingPdf(true);
+
+        try {
+            const response = await fetch(`${API_BASE}/api/reports/pdf`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ report }),
+            });
+            const data = await parseJsonResponse(response);
+            if (!response.ok) {
+                throw new Error(data.error || `Request failed with status ${response.status}`);
+            }
+            setPdfMessage(`PDF saved to Desktop: ${data.filename}`);
+        } catch (err) {
+            setPdfMessage(`Error: ${err?.message || "Failed to save PDF"}`);
+        } finally {
+            setIsSavingPdf(false);
+        }
+    }
+
     async function runScan() {
         setError("");
         setIsLoading(true);
         try {
-            const response = await fetch("http://127.0.0.1:5000/api/scan", {
+            const response = await fetch(`${API_BASE}/api/scan`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -174,7 +218,7 @@ function DashboardApp() {
             if (!response.ok) {
                 throw new Error(`Request failed with status ${response.status}`);
             }
-            const data = await response.json();
+            const data = await parseJsonResponse(response);
             setReport(data);
             setLastScan(new Date().toLocaleString());
             navigate("/scan-results");
@@ -189,17 +233,33 @@ function DashboardApp() {
         <div className="container">
                 <header className="topbar">
                     <div>
-                        <h1>Linux Security Audit Dashboard</h1>
+                        <h1>Security Audit Dashboard</h1>
                         <p className="subtitle">
                             Run checks and review your host security posture quickly.
                         </p>
                     </div>
                     <div className="topbar-actions">
-                        <button type="button" onClick={runScan} disabled={isLoading}>
+                        {route === "result" && report && (
+                            <button
+                                type="button"
+                                className="secondary-btn"
+                                onClick={saveAsPdf}
+                                disabled={isLoading || isSavingPdf}
+                            >
+                                {isSavingPdf ? "Saving PDF..." : "Save as PDF"}
+                            </button>
+                        )}
+                        <button type="button" onClick={runScan} disabled={isLoading || isSavingPdf}>
                             {isLoading ? "Scanning..." : route === "result" ? "Rescan" : "Run Scan"}
                         </button>
                     </div>
                 </header>
+
+                {pdfMessage && (
+                    <p className={`pdf-message ${pdfMessage.startsWith("Error:") ? "error" : "success"}`}>
+                        {pdfMessage}
+                    </p>
+                )}
 
                 <section className="meta-panel">
                     <div className="meta-item">
@@ -210,6 +270,9 @@ function DashboardApp() {
                     </div>
                     <div className="meta-item">
                         <span>Host IP:</span> <strong>{report?.host_ip || "-"}</strong>
+                    </div>
+                    <div className="meta-item">
+                        <span>MAC Address:</span> <strong>{report?.host_mac || "-"}</strong>
                     </div>
                     <div className="meta-item">
                         <span>Scan Time:</span> <strong>{formatDuration(report?.duration_seconds)}</strong>

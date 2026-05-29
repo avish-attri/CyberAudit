@@ -1,9 +1,63 @@
 import subprocess
+import platform
 from scanner.utils import build_result
 
 def check_ssh_service():
-    for unit in ("ssh", "sshd"):
+    # WINDOWS
+    if platform.system() == "Windows":
+
         try:
+
+            result = subprocess.run(
+                ["sc", "query", "sshd"],
+                capture_output=True,
+                text=True,
+            )
+
+            output = (
+                result.stdout +
+                result.stderr
+            ).lower()
+
+            if "running" in output:
+
+                return build_result(
+                    "SERVICE-SSH",
+                    "SSH Service Status",
+                    "warn",
+                    {
+                        "service": "sshd",
+                        "status": "active",
+                        "reason": "SSH service exposed",
+                    },
+                )
+
+            return build_result(
+                "SERVICE-SSH",
+                "SSH Service Status",
+                "pass",
+                {
+                    "service": "sshd",
+                    "status": "inactive",
+                },
+            )
+
+        except Exception as e:
+
+            return build_result(
+                "SERVICE-SSH",
+                "SSH Service Status",
+                "unknown",
+                {
+                    "error": str(e),
+                },
+            )
+
+    # LINUX
+    for unit in ("ssh", "sshd"):
+
+        try:
+
             result = subprocess.run(
                 ["systemctl", "is-active", unit],
                 capture_output=True,
@@ -11,7 +65,9 @@ def check_ssh_service():
             )
 
             status_output = result.stdout.strip()
+
             if status_output == "active":
+
                 return build_result(
                     "SERVICE-SSH",
                     "SSH Service Status",
@@ -23,7 +79,13 @@ def check_ssh_service():
                     },
                 )
 
-            if status_output in {"inactive", "failed", "activating", "deactivating"}:
+            if status_output in {
+                "inactive",
+                "failed",
+                "activating",
+                "deactivating",
+            }:
+
                 return build_result(
                     "SERVICE-SSH",
                     "SSH Service Status",
@@ -33,7 +95,7 @@ def check_ssh_service():
                         "status": status_output,
                     },
                 )
-            
+
             if status_output == "unknown":
                 continue
 
@@ -46,7 +108,9 @@ def check_ssh_service():
                     "status": status_output,
                 },
             )
+
         except Exception as e:
+
             return build_result(
                 "SERVICE-SSH",
                 "SSH Service Status",
@@ -67,8 +131,58 @@ def check_ssh_service():
     )
 
 def check_running_services():
+    if platform.system() == "Windows":
 
+        try:
+
+            result = subprocess.run(
+                "sc query state= all",
+                shell=True,
+                capture_output=True,
+                text=True,
+            )
+
+            if result.returncode != 0:
+
+                return build_result(
+                    "SERVICE-RUNNING-COUNT",
+                    "Running Services Count",
+                    "ERROR",
+                    {
+                        "error": result.stderr,
+                    },
+                )
+
+            count = result.stdout.count("RUNNING")
+
+            status = "PASS"
+
+            if count > 150:
+                status = "WARNING"
+
+            return build_result(
+                "SERVICE-RUNNING-COUNT",
+                "Running Services Count",
+                status,
+                {
+                    "count": count,
+                },
+            )
+
+        except Exception as e:
+
+            return build_result(
+                "SERVICE-RUNNING-COUNT",
+                "Running Services Count",
+                "ERROR",
+                {
+                    "error": str(e),
+                },
+            )
+
+    # LINUX
     try:
+
         result = subprocess.run(
             [
                 "systemctl",
@@ -81,6 +195,7 @@ def check_running_services():
         )
 
         if result.returncode != 0:
+
             return build_result(
                 "SERVICE-RUNNING-COUNT",
                 "Running Services Count",
@@ -91,11 +206,13 @@ def check_running_services():
             )
 
         services = [
-            line for line in result.stdout.splitlines()
+            line
+            for line in result.stdout.splitlines()
             if ".service" in line
         ]
 
         count = len(services)
+
         status = "PASS"
 
         if count > 150:

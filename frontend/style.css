@@ -90,8 +90,34 @@ button:disabled {
     border-color: var(--border);
 }
 
-.secondary-btn:hover {
+.secondary-btn {
     background: var(--panel-soft);
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+
+.secondary-btn:hover {
+    background: #1f2a40;
+}
+
+.pdf-message {
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 0.92rem;
+}
+
+.pdf-message.success {
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.35);
+    color: #86efac;
+}
+
+.pdf-message.error {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
 }
 
 .meta-panel {

@@ -12,6 +12,6 @@ echo "Installing dependencies..."
 
 pip install -r requirements.txt
 
-echo "Starting Linux Security Audit Tool..."
+echo "Starting Security Audit Tool..."
 
 python app.py
