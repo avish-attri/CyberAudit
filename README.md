@@ -322,6 +322,24 @@ CyberAudit/
 
 ---
 
+## Screenshots
+
+### Dashboard
+
+![Dashboard](screenshots/homee.png)
+
+### Scan Results
+
+![Scan Results](screenshots/output1.png)
+
+![Scan Results](screenshots/output2.png)
+
+![Scan Results](screenshots/output3.png)
+
+### PDF Report Export
+
+![PDF Export](screenshots/pdf.png)
+
 # Author
 
 Avish Attri
