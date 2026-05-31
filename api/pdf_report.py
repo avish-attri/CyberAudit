@@ -10,7 +10,6 @@ BRAND_TAGLINE = "Scan · Analyze · Secure"
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 LOGO_CANDIDATES = (
     PROJECT_ROOT / "frontend" / "assets" / "CyberAudit-logo.png",
-    PROJECT_ROOT / "frontend" / "assets" / "cyberlens-logo.png",
 )
 LOGO_HEIGHT_MM = 20
 
