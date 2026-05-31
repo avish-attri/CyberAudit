@@ -1,136 +1,8 @@
-# CyberAuditTool
+# CyberAudit
 
-A modular security auditing dashboard built using Python, Flask, React, and JavaScript.
+A cross-platform security auditing dashboard built using Python, Flask, React, and JavaScript.
 
-The tool performs automated Linux security checks and displays findings through a modern web dashboard.
-
----
-
-## Features
-
-- security auditing
-- Real-time scan dashboard
-- Modular scanner architecture
-- Risk-level filtering
-- Security score calculation
-- Authentication checks
-- Filesystem checks
-- Network checks
-- Logging checks
-- Service checks
-- Human-readable recommendations
-- Scan metadata display
-- Local web dashboard
-
----
-
-# Tech Stack
-
-## Backend
-- Python
-- Flask
-- Flask-CORS
-
-## Frontend
-- React
-- JavaScript
-- HTML
-- CSS
-
-## Security & System
-- Linux system commands
-- Filesystem analysis
-- SSH configuration auditing
-- Service inspection
-
----
-
-# React Frontend
-
-The frontend dashboard is built using React and rendered through:
-
-```text
-frontend/app.jsx
-```
-
-React is loaded through CDN inside:
-
-```text
-frontend/index.html
-```
-
-using:
-- React
-- ReactDOM
-- Babel
-
-This keeps the frontend lightweight without requiring a full React build setup.
-
----
-
-# Project Structure
-
-```bash
-linux-security-audit-tool/
-│
-├── api/
-│   └── routes.py
-│
-├── frontend/
-│   ├── index.html
-│   ├── style.css
-│   ├── script.js
-│   └── app.jsx
-│
-├── scanner/
-│   ├── auth_checks.py
-│   ├── file_checks.py
-│   ├── logging_checks.py
-│   ├── network_checks.py
-│   ├── service_checks.py
-│   ├── system_checks.py
-│   ├── scorer.py
-│   ├── utils.py
-│   └── main.py
-│
-├── app.py
-├── requirements.txt
-├── setup.sh
-└── README.md
-```
-
----
-
-# Security Checks Implemented
-
-## Authentication Checks
-- UID 0 user detection
-- SSH root login check
-- SSH password authentication check
-- Guest account detection
-- Empty password account detection
-- Password expiry policy audit
-
-## Filesystem Checks
-- World writable files
-- SUID binary detection
-- /etc/passwd permission checks
-- /etc/shadow permission checks
-
-## Network Checks
-- Open ports detection
-- Firewall status
-- SSH service exposure
-
-## Logging Checks
-- Authentication log verification
-- Failed login detection
-
-## System Checks
-- Pending security updates
-- Running services count
-- Root disk usage
-- Kernel version audit
+CyberAudit performs automated security and configuration audits on both Linux and Windows systems, providing actionable findings through a modern web dashboard.
 
 ---
 
@@ -139,25 +11,26 @@ linux-security-audit-tool/
 ## Clone Repository
 
 ```bash
-git clone https://github.com/avish-attri/sec-audit-linux.git
-cd sec-audit-linux
+git clone https://github.com/avish-attri/CyberAudit.git
+cd CyberAudit
 ```
 
 ---
 
 # Quick Setup
 
-Run:
+## Linux
 
 ```bash
 chmod +x setup.sh
 ./setup.sh
 ```
 
-This script:
-- creates virtual environment
-- installs dependencies
-- starts the Flask server
+## Windows
+
+```cmd
+setup.bat
+```
 
 ---
 
@@ -166,20 +39,32 @@ This script:
 ## Create Virtual Environment
 
 ```bash
-python3 -m venv venv
+python -m venv venv
 ```
 
-## Activate Virtual Environment
+## Activate Environment
+
+### Linux
 
 ```bash
 source venv/bin/activate
 ```
+
+### Windows
+
+```cmd
+venv\Scripts\activate
+```
+
+---
 
 ## Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
+
+---
 
 ## Run Application
 
@@ -199,22 +84,22 @@ http://127.0.0.1:5000/scan
 
 ---
 
-# How React Frontend Works
-
-## Frontend Flow
+# How CyberAudit Works
 
 ```text
 User clicks "Run Scan"
         ↓
-React frontend sends API request
+React dashboard sends API request
         ↓
 Flask backend receives request
         ↓
-Python scanner executes Linux checks
+Platform detection occurs
+        ↓
+Linux or Windows scanners execute
         ↓
 Results returned as JSON
         ↓
-React dashboard updates dynamically
+Dashboard updates dynamically
 ```
 
 ---
@@ -235,46 +120,207 @@ GET /api/scan-results
 
 ---
 
-# Dashboard Features
+## Features
 
-- Security score visualization
-- Risk-level filtering
-- Pass / Warning / Fail / Unavailable statistics
-- Detailed recommendations
-- Scan metadata
-- Responsive dark-mode UI
+* Cross-platform security auditing
+* Real-time scan dashboard
+* Risk-level filtering
+* Security score calculation
+* Authentication audits
+* Filesystem audits
+* Network audits
+* Service audits
+* Logging audits
+* PDF report export
+  
+---
+
+# PDF Report Export
+
+CyberAudit allows users to export scan results as a professional PDF report.
+
+The generated report includes:
+
+* Scan timestamp
+* Security score
+* Audit summary
+* Detailed findings
+* Risk levels
+* Recommendations
+* System information
+
+This enables users to archive scan results, share reports, and track security improvements over time.
 
 ---
 
-# Sample Workflow
+# Tech Stack
 
-1. Launch application
-2. Open dashboard in browser
-3. Click "Run Scan"
-4. Scanner performs security audit
-5. Results displayed in dashboard
+## Backend
+
+* Python
+* Flask
+* Flask-CORS
+
+## Frontend
+
+* React
+* JavaScript
+* HTML
+* CSS
+
+# React Frontend
+
+The frontend dashboard is built using React and rendered through:
+
+```text
+frontend/app.jsx
+```
+
+React is loaded through CDN inside:
+
+```text
+frontend/index.html
+```
+
+using:
+
+* React
+* ReactDOM
+* Babel
+
+This keeps the frontend lightweight without requiring a full React build setup.
+
+---
+
+# Project Structure
+
+```bash
+CyberAudit/
+│
+├── api/
+│   └── routes.py
+│
+├── frontend/
+│   ├── assets/
+│   │   └── cyberaudit-logo.png
+│   ├── index.html
+│   ├── style.css
+│   └── app.jsx
+│
+├── scanner/
+│   ├── auth_checks.py
+│   ├── filesystem_checks.py
+│   ├── logging_checks.py
+│   ├── network_checks.py
+│   ├── service_checks.py
+│   ├── system_checks.py
+│   ├── windows_checks.py
+│   ├── linux_checks.py
+│   ├── scorer.py
+│   ├── utils.py
+│   └── main.py
+│
+├── app.py
+├── requirements.txt
+├── setup.sh
+├── setup.bat
+└── README.md
+```
+
+---
+
+# Security Checks Implemented
+
+## Authentication Checks
+
+### Linux
+
+* UID 0 user detection
+* SSH root login audit
+* SSH password authentication audit
+* Empty password account detection
+* Password expiry policy verification
+
+### Windows
+
+* Administrator account verification
+* Guest account status
+* Password policy audit
+* Account lockout policy audit
+
+---
+
+## Filesystem Checks
+
+### Linux
+
+* World writable files
+* SUID binary detection
+* /etc/passwd permission audit
+* /etc/shadow permission audit
+
+### Windows
+
+* Sensitive directory permission verification
+* Startup folder inspection
+* Writable system directory detection
+
+---
+
+## Network Checks
+
+### Linux & Windows
+
+* Open ports detection
+* Firewall status verification
+* Remote access exposure detection
+* Listening service enumeration
+
+---
+
+## Logging Checks
+
+### Linux
+
+* Authentication log verification
+* Failed login detection
+
+### Windows
+
+* Security Event Log verification
+* Failed logon event detection
+
+---
+
+## System Checks
+
+### Linux
+
+* Pending security updates
+* Running services audit
+* Root disk usage verification
+* Kernel version audit
+
+### Windows
+
+* Windows Update status
+* Windows Defender status
+* Running services audit
+* Disk usage analysis
 
 ---
 
 # Important Notes
 
-- Some checks require elevated permissions
-- Recommended to run on Linux systems
-- Certain checks may be unavailable depending on:
-  - Linux distribution
-  - installed services
-  - user permissions
+* Some checks require administrative privileges.
+* Certain checks may be unavailable depending on:
+
+  * Operating system
+  * Installed services
+  * User permissions
+  * System configuration
 
 ---
-
-
-<!-- # Screenshots
-
-## Dashboard
-
-Add screenshots here.
-
---- -->
 
 # Author
 
@@ -282,5 +328,3 @@ Avish Attri
 
 GitHub:
 https://github.com/avish-attri
-
----
