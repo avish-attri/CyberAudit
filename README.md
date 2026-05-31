@@ -1,4 +1,4 @@
-# Security Audit Tool
+# CyberAuditTool
 
 A modular security auditing dashboard built using Python, Flask, React, and JavaScript.
 

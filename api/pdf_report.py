@@ -5,6 +5,21 @@ from pathlib import Path
 from fpdf import FPDF
 
 REPORT_FILENAME = "Security-audit-report.pdf"
+BRAND_NAME = "CyberAudit"
+BRAND_TAGLINE = "Scan · Analyze · Secure"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+LOGO_CANDIDATES = (
+    PROJECT_ROOT / "frontend" / "assets" / "CyberAudit-logo.png",
+    PROJECT_ROOT / "frontend" / "assets" / "cyberlens-logo.png",
+)
+LOGO_HEIGHT_MM = 20
+
+
+def _resolve_logo_path() -> Path | None:
+    for candidate in LOGO_CANDIDATES:
+        if candidate.is_file():
+            return candidate
+    return None
 
 STATUS_ORDER = {"FAIL": 1, "WARNING": 2, "ERROR": 3, "PASS": 4}
 
@@ -38,6 +53,47 @@ def get_desktop_dir() -> Path:
     return desktop
 
 
+class AuditReportPDF(FPDF):
+    def footer(self):
+        self.set_y(-14)
+        self.set_font("Helvetica", "I", 8)
+        self.set_text_color(100, 100, 100)
+        self.cell(0, 8, _safe_text(f"{BRAND_NAME}  |  {BRAND_TAGLINE}"), align="C")
+        self.set_text_color(0, 0, 0)
+
+
+def _draw_brand_header(pdf: FPDF) -> None:
+    y0 = pdf.get_y()
+    text_x = pdf.l_margin
+    logo_bottom = y0
+
+    logo_path = _resolve_logo_path()
+    if logo_path:
+        try:
+            pdf.image(str(logo_path), x=pdf.l_margin, y=y0, h=LOGO_HEIGHT_MM)
+            text_x = pdf.l_margin + LOGO_HEIGHT_MM + 5
+            logo_bottom = y0 + LOGO_HEIGHT_MM
+        except Exception:
+            pass
+
+    pdf.set_xy(text_x, y0)
+    pdf.set_font("Helvetica", "B", 22)
+    pdf.cell(0, 10, _safe_text(BRAND_NAME), ln=True)
+    pdf.set_x(text_x)
+    pdf.set_font("Helvetica", "", 12)
+    pdf.cell(0, 7, _safe_text("Security Audit Report"), ln=True)
+    pdf.set_x(text_x)
+    pdf.set_font("Helvetica", "I", 9)
+    pdf.cell(0, 5, _safe_text(BRAND_TAGLINE), ln=True)
+
+    pdf.set_y(max(logo_bottom, pdf.get_y()) + 6)
+    pdf.set_draw_color(56, 189, 248)
+    pdf.set_line_width(0.4)
+    content_width = pdf.w - pdf.l_margin - pdf.r_margin
+    pdf.line(pdf.l_margin, pdf.get_y(), pdf.l_margin + content_width, pdf.get_y())
+    pdf.ln(6)
+
+
 def _count_statuses(results: list) -> dict:
     counts = {"PASS": 0, "WARNING": 0, "FAIL": 0, "ERROR": 0}
     for item in results:
@@ -55,15 +111,14 @@ def save_scan_pdf(report: dict) -> Path:
     results = _sort_results(report.get("results") or [])
     counts = _count_statuses(results)
 
-    pdf = FPDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf = AuditReportPDF()
+    pdf.set_auto_page_break(auto=True, margin=20)
     pdf.add_page()
     content_width = pdf.w - pdf.l_margin - pdf.r_margin
-    pdf.set_font("Helvetica", "B", 16)
-    pdf.cell(0, 10, "Security Audit Report", ln=True)
+
+    _draw_brand_header(pdf)
 
     pdf.set_font("Helvetica", "", 11)
-    pdf.ln(4)
     pdf.cell(0, 7, _safe_text(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"), ln=True)
     pdf.cell(0, 7, _safe_text(f"Security Score: {report.get('score', 0)}%"), ln=True)
     pdf.cell(0, 7, _safe_text(f"Host IP: {report.get('host_ip', '-')}"), ln=True)

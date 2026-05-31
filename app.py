@@ -28,5 +28,5 @@ def serve_frontend_file(filename):
 
 
 if __name__ == "__main__":
-    print("Starting Security Audit Tool on http://127.0.0.1:5000/scan")
+    print("Starting CyberAudit - Security Audit Tool on http://127.0.0.1:5000/scan")
     app.run(host="127.0.0.1", port=5000, debug=False)

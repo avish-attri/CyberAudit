@@ -1,6 +1,32 @@
 const { useEffect, useMemo, useState } = React;
 
 const API_BASE = "http://127.0.0.1:5000";
+const LOGO_SRC = "/frontend/assets/CyberAudit-logo.png";
+
+function SiteFooter() {
+    return (
+        <footer className="site-footer">
+            <div className="site-footer-brand" >
+                <img src={LOGO_SRC} alt="CyberAudit logo" className="site-footer-logo" />
+                <div>
+                    <p className="site-footer-title">CyberAudit</p>
+                    <p className="site-footer-tagline">Scan · Analyze · Secure</p>
+                </div>
+            </div>
+            <p className="site-footer-about">
+                CyberAudit is a cross-platform security auditing tool designed to help users identify potential security risks across Linux and Windows systems. It performs automated checks on authentication policies, network exposure, running services, firewall configurations, system updates, and file permissions, providing actionable insights to improve system security and compliance.
+
+                Our mission is to make security assessment simple, accessible, and effective through automated analysis and clear reporting.
+
+            </p>
+            <div className="page-end-line" role="presentation">
+                <span className="page-end-line-bar" />
+                <p className="site-footer-copy">© Designed & Developed by Avish</p>
+                <span className="page-end-line-bar" />
+            </div>
+        </footer>
+    );
+}
 
 async function parseJsonResponse(response) {
     const contentType = response.headers.get("content-type") || "";
@@ -48,7 +74,7 @@ function DashboardApp() {
         "Network and Port Security",
         "Log Configuration",
         "System Integrity and Package Status",
-        "Firewall and Access Controls",
+        "Firewall Security",
         "Sudo and Privilege Restrictions",
     ];
 
@@ -232,11 +258,20 @@ function DashboardApp() {
     return (
         <div className="container">
                 <header className="topbar">
-                    <div>
-                        <h1>Security Audit Dashboard</h1>
-                        <p className="subtitle">
-                            Run checks and review your host security posture quickly.
-                        </p>
+                    <div className="brand-block">
+                        <img
+                            src={LOGO_SRC}
+                            alt="CyberAudit"
+                            className="brand-logo"
+                        />
+                        <div>
+                            <h1 className="brand-heading">
+                                <span className="brand-cyber">CyberAudit</span>
+                                <span className="brand-dash"> - </span>
+                                <span className="brand-product" style={{ fontSize: "22px" }}>Security Audit Tool</span>
+                            </h1>
+                            <p className="subtitle brand-tagline">Scan · Analyze · Secure</p>
+                        </div>
                     </div>
                     <div className="topbar-actions">
                         {route === "result" && report && (
@@ -382,6 +417,20 @@ function DashboardApp() {
                     )}
                 </div>
 
+                {route === "result" && (
+                    <footer className="score-footer">
+                        <p className="score-footer-title">Score guidance</p>
+                        <p>
+                            A security score of <strong>70%+</strong> is considered safe for{" "}
+                            <strong>Linux</strong> systems.
+                        </p>
+                        <p>
+                            A security score of <strong>50%+</strong> is considered safe for{" "}
+                            <strong>Windows</strong> systems.
+                        </p>
+                    </footer>
+                )}
+
                 {route === "scan" && (
                     <section className="collapsible-panel">
                         <button
@@ -408,6 +457,8 @@ function DashboardApp() {
                         )}
                     </section>
                 )}
+
+                <SiteFooter />
         </div>
     );
 }
