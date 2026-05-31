@@ -131,7 +131,26 @@ GET /api/scan-results
 * Network audits
 * Service audits
 * Logging audits
+* PDF report export
   
+---
+
+# PDF Report Export
+
+CyberAudit allows users to export scan results as a professional PDF report.
+
+The generated report includes:
+
+* Scan timestamp
+* Security score
+* Audit summary
+* Detailed findings
+* Risk levels
+* Recommendations
+* System information
+
+This enables users to archive scan results, share reports, and track security improvements over time.
+
 ---
 
 # Tech Stack
