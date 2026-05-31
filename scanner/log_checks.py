@@ -5,7 +5,6 @@ from scanner.utils import build_result, run_command
 
 
 def check_failed_logins():
-
     # WINDOWS
     if platform.system() == "Windows":
 

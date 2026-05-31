@@ -3,12 +3,14 @@ from scanner.utils import build_result, run_command, format_details, not_availab
 import platform
 
 def check_uid_zero_users():    
+    # WINDOWS
     if platform.system() == "Windows":
         return not_available_result(
             "AUTH-UID0-USERS",
             "UID 0 Users",
         )
     
+    # LINUX
     try:
         users = []
         with open("/etc/passwd", "r", encoding="utf-8") as f:
@@ -46,12 +48,14 @@ def check_uid_zero_users():
 
 
 def check_ssh_root_login():
+    # WINDOWS
     if platform.system() == "Windows":
         return not_available_result(
             "AUTH-SSH-ROOT",
             "SSH Root Login",
         )
     
+    # LINUX
     try:
         with open("/etc/ssh/sshd_config", "r", encoding="utf-8") as f:
             data = f.read()
@@ -83,12 +87,14 @@ def check_ssh_root_login():
 
 
 def check_ssh_password_auth():
+    # WINDOWS
     if platform.system() == "Windows":
         return not_available_result(
             "AUTH-SSH-PASSWORD",
             "SSH Password Authentication",
         )
     
+    # LINUX
     try:
         with open("/etc/ssh/sshd_config", "r", encoding="utf-8") as f:
             data = f.read()
@@ -120,6 +126,7 @@ def check_ssh_password_auth():
 
 
 def check_guest_account():
+    # WINDOWS
     if platform.system() == "Windows":
 
         result = run_command("net user Guest")
@@ -160,6 +167,7 @@ def check_guest_account():
             },
         )
     
+    # LINUX
     passwd_path = Path("/etc/passwd")
 
     if not passwd_path.exists():
@@ -201,6 +209,7 @@ def check_guest_account():
 
 
 def check_password_policy():
+    # WINDOWS
     if platform.system() == "Windows":
 
         result = run_command("net accounts")
@@ -253,6 +262,7 @@ def check_password_policy():
             },
         )
      
+    # LINUX
     config = Path("/etc/login.defs")
 
     if not config.exists():
@@ -305,7 +315,7 @@ def check_password_policy():
 
 
 def check_empty_password_accounts():
-
+    # WINDOWS
     if platform.system() == "Windows":
 
         result = run_command(
@@ -375,6 +385,7 @@ def check_empty_password_accounts():
             },
         )
 
+    # LINUX
     shadow = Path("/etc/shadow")
 
     if not shadow.exists():

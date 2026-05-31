@@ -9,9 +9,7 @@ from scanner.utils import (
     format_details,
 )
 
-
 def check_passwd_permissions():
-
     # WINDOWS
     if platform.system() == "Windows":
 
@@ -62,7 +60,6 @@ def check_passwd_permissions():
 
 
 def check_shadow_permissions():
-
     # WINDOWS
     if platform.system() == "Windows":
 
@@ -113,7 +110,6 @@ def check_shadow_permissions():
 
 
 def check_world_writable_files():
-
     # WINDOWS
     if platform.system() == "Windows":
 
@@ -216,7 +212,6 @@ def check_world_writable_files():
     )
 
 def check_suid_binaries():
-
     # WINDOWS
     if platform.system() == "Windows":
         return not_available_result(

@@ -131,6 +131,7 @@ def check_ssh_service():
     )
 
 def check_running_services():
+    # WINDOWS
     if platform.system() == "Windows":
 
         try:

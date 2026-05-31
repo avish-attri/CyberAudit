@@ -2,7 +2,7 @@ from scanner.utils import run_command, format_details, build_result
 import platform
 
 def check_open_ports():
-
+    # WINDOWS
     if platform.system() == "Windows":
 
         result = run_command(
@@ -101,7 +101,6 @@ def check_firewall_status():
 
         output = result["output"].lower()
 
-        # Domain, Private and Public profiles all ON
         if output.count("on") >= 3:
 
             return build_result(
@@ -112,8 +111,7 @@ def check_firewall_status():
                     "details": "Windows Firewall is active on all profiles"
                 },
             )
-
-        # At least one profile OFF
+        
         if "off" in output:
 
             return build_result(

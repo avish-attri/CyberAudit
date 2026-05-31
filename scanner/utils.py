@@ -88,7 +88,6 @@ def format_details(data_value):
     if "unable to determine firewall status" in low:
         return "Could not determine firewall status"
 
-    # truncate long text
     return text if len(text) <= 120 else text[:117] + "..."
 
 

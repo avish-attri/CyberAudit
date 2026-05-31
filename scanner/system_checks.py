@@ -8,7 +8,7 @@ LATEST_KERNEL = "6.8.0"
 LATEST_WINDOWS_BUILD = "10.0.22631"
 
 def check_kernel_version():
-
+    # WINDOWS
     if platform.system() == "Windows":
 
         result = run_command("ver")
@@ -78,7 +78,6 @@ def check_kernel_version():
         )
 
     # LINUX
-
     result = run_command("uname -r")
 
     if not result["success"]:
@@ -131,7 +130,7 @@ def check_kernel_version():
 
 
 def check_pending_updates():
-
+    # WINDOWS
     if platform.system() == "Windows":
 
         result = run_command(
@@ -177,6 +176,7 @@ def check_pending_updates():
             },
         )
 
+    # LINUX
     result = run_command(
         "apt list --upgradable 2>/dev/null"
     )
@@ -252,7 +252,7 @@ def check_disk_usage():
 
 
 def check_security_updates():
-
+    # WINDOWS
     if platform.system() == "Windows":
 
         result = run_command(
@@ -298,6 +298,7 @@ def check_security_updates():
             },
         )
 
+    # LINUX
     try:
 
         result = subprocess.run(

@@ -29,6 +29,7 @@ from scanner.system_checks import (
     check_disk_usage,
     check_security_updates,
 )
+
 from scanner.logging_checks import check_auth_logs
 from scanner.log_checks import check_failed_logins
 from scanner.service_checks import (
