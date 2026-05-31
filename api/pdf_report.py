@@ -8,16 +8,28 @@ REPORT_FILENAME = "Security-audit-report.pdf"
 BRAND_NAME = "CyberAudit"
 BRAND_TAGLINE = "Scan · Analyze · Secure"
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-LOGO_CANDIDATES = (
-    PROJECT_ROOT / "frontend" / "assets" / "CyberAudit-logo.png",
-)
+ASSETS_DIR = PROJECT_ROOT / "frontend" / "assets"
 LOGO_HEIGHT_MM = 20
 
 
 def _resolve_logo_path() -> Path | None:
-    for candidate in LOGO_CANDIDATES:
+    preferred_names = (
+        "cyberaudit-logo.png",
+        "CyberAudit-logo.png",
+        "cyberlens-logo.png",
+    )
+    for name in preferred_names:
+        candidate = ASSETS_DIR / name
         if candidate.is_file():
             return candidate
+
+    if not ASSETS_DIR.is_dir():
+        return None
+
+    for candidate in ASSETS_DIR.iterdir():
+        if candidate.is_file() and candidate.suffix.lower() == ".png":
+            if "logo" in candidate.name.lower():
+                return candidate
     return None
 
 STATUS_ORDER = {"FAIL": 1, "WARNING": 2, "ERROR": 3, "PASS": 4}

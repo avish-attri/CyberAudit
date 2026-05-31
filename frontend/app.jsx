@@ -1,7 +1,7 @@
 const { useEffect, useMemo, useState } = React;
 
 const API_BASE = "http://127.0.0.1:5000";
-const LOGO_SRC = "/frontend/assets/CyberAudit-logo.png";
+const LOGO_SRC = "/frontend/assets/cyberaudit-logo.png";
 
 function SiteFooter() {
     return (
