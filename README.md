@@ -229,98 +229,23 @@ CyberAudit/
 
 ---
 
-# Security Checks Implemented
+## Screenshots
 
-## Authentication Checks
+### Dashboard
 
-### Linux
+![Dashboard](screenshots/homee.png)
 
-* UID 0 user detection
-* SSH root login audit
-* SSH password authentication audit
-* Empty password account detection
-* Password expiry policy verification
+### Scan Results
 
-### Windows
+![Scan Results](screenshots/output1.png)
 
-* Administrator account verification
-* Guest account status
-* Password policy audit
-* Account lockout policy audit
+![Scan Results](screenshots/output2.png)
 
----
+![Scan Results](screenshots/output3.png)
 
-## Filesystem Checks
+### PDF Report Export
 
-### Linux
-
-* World writable files
-* SUID binary detection
-* /etc/passwd permission audit
-* /etc/shadow permission audit
-
-### Windows
-
-* Sensitive directory permission verification
-* Startup folder inspection
-* Writable system directory detection
-
----
-
-## Network Checks
-
-### Linux & Windows
-
-* Open ports detection
-* Firewall status verification
-* Remote access exposure detection
-* Listening service enumeration
-
----
-
-## Logging Checks
-
-### Linux
-
-* Authentication log verification
-* Failed login detection
-
-### Windows
-
-* Security Event Log verification
-* Failed logon event detection
-
----
-
-## System Checks
-
-### Linux
-
-* Pending security updates
-* Running services audit
-* Root disk usage verification
-* Kernel version audit
-
-### Windows
-
-* Windows Update status
-* Windows Defender status
-* Running services audit
-* Disk usage analysis
-
----
-
-# Important Notes
-
-* Some checks require administrative privileges.
-* Certain checks may be unavailable depending on:
-
-  * Operating system
-  * Installed services
-  * User permissions
-  * System configuration
-
----
+![PDF Export](screenshots/pdf.png)
 
 # Author
 
