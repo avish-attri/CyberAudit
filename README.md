@@ -29,7 +29,7 @@ chmod +x setup.sh
 ## Windows
 
 ```cmd
-setup.bat
+./setup.sh
 ```
 
 ---
