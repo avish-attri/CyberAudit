@@ -1,4 +1,7 @@
 from pathlib import Path
+import mimetypes
+
+mimetypes.add_type("application/javascript", ".jsx")
 
 from flask import Flask, send_from_directory
 from flask_cors import CORS
@@ -64,7 +67,8 @@ def serve_frontend_file(filename):
     resolved = _resolve_frontend_file(filename)
     if resolved is None:
         return {"error": "File not found"}, 404
-    return send_from_directory(resolved.parent, resolved.name)
+    mimetype, _ = mimetypes.guess_type(resolved.name)
+    return send_from_directory(resolved.parent, resolved.name, mimetype=mimetype)
 
 
 if __name__ == "__main__":
