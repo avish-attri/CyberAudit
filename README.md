@@ -223,7 +223,6 @@ CyberAudit/
 ├── app.py
 ├── requirements.txt
 ├── setup.sh
-├── setup.bat
 └── README.md
 ```
 
